@@ -23,7 +23,7 @@ export const STATUS: Record<StatusId, StatusMeta> = {
   sem_retorno: { id: 'sem_retorno', label: 'Sem retorno', short: 'Sem retorno', order: 1, color: '#8A8A93', ativo: true },
   recontato: { id: 'recontato', label: 'Recontatado', short: 'Recontato', order: 2, color: '#FBBF24', ativo: true },
   negociando: { id: 'negociando', label: 'Negociando', short: 'Negociando', order: 3, color: '#FF6A3D', ativo: true },
-  ganho: { id: 'ganho', label: 'Fechado — Ganho', short: 'Ganho', order: 4, color: '#34D399', ativo: false },
+  ganho: { id: 'ganho', label: 'Venda concluída', short: 'Venda concluída', order: 4, color: '#34D399', ativo: false },
   perdido: { id: 'perdido', label: 'Perdido', short: 'Perdido', order: 5, color: '#F5544F', ativo: false },
 }
 
