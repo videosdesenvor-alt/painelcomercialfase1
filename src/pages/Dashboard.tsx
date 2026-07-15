@@ -149,7 +149,7 @@ export function Dashboard() {
                         onClick={() => setPeriod(p.k)}
                         className={cn(
                           'rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors tnum',
-                          period === p.k ? 'bg-ember text-white shadow-[0_4px_12px_-4px_rgba(255,76,36,0.8)]' : 'text-ink-mute hover:text-ink',
+                          period === p.k ? 'bg-ember text-white shadow-[0_4px_12px_-4px_rgba(253,78,23,0.8)]' : 'text-ink-mute hover:text-ink',
                         )}
                       >
                         {p.k}
@@ -199,7 +199,7 @@ export function Dashboard() {
                 size={188}
                 thickness={18}
                 segments={[
-                  { value: top.ativos, color: '#FF6A3D', label: 'Ativos' },
+                  { value: top.ativos, color: '#FF7A21', label: 'Ativos' },
                   { value: top.ganhos, color: '#34D399', label: 'Ganhos' },
                   { value: top.perdidos, color: '#F5544F', label: 'Perdidos' },
                 ]}
@@ -296,7 +296,7 @@ export function Dashboard() {
             />
             <div className="mt-4 flex items-center gap-2 text-[11px] text-ink-mute">
               <span>Menos</span>
-              <div className="h-2 flex-1 rounded-full" style={{ background: 'linear-gradient(90deg, rgba(255,76,36,0.16), rgba(255,76,36,0.92))' }} />
+              <div className="h-2 flex-1 rounded-full" style={{ background: 'linear-gradient(90deg, rgba(253,78,23,0.16), rgba(253,78,23,0.92))' }} />
               <span>Mais</span>
               <span className="ml-2 chip">{estados.length} UFs ativas</span>
             </div>
@@ -313,7 +313,7 @@ export function Dashboard() {
                   label={`${e.uf} · ${UF_NOME[e.uf]}`}
                   value={e.total}
                   max={maxEstado}
-                  color="#FF4C24"
+                  color="#FD4E17"
                   leading={
                     <span className="grid h-8 w-9 shrink-0 place-items-center rounded-lg border border-hair bg-white/[0.02] font-display text-xs font-bold text-ember">
                       {e.uf}

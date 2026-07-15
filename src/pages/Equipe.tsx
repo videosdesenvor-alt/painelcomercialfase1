@@ -10,7 +10,7 @@ function StatPill({ label, value, color }: { label: string; value: string; color
   return (
     <div className="rounded-xl border border-hair bg-white/[0.02] px-3 py-2.5">
       <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-mute">{label}</div>
-      <div className="mt-0.5 font-display text-lg font-bold tnum" style={{ color: color ?? '#F5F5F4' }}>
+      <div className="mt-0.5 font-display text-lg font-bold tnum" style={{ color: color ?? '#F5F6FA' }}>
         {value}
       </div>
     </div>
@@ -47,18 +47,18 @@ function VendedorCard({ v, rank, maxReceita }: { v: VendedorAgg; rank: number; m
 
       {/* barra composição */}
       <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-white/[0.05]">
-        <div style={{ width: `${(v.ativos / total) * 100}%`, background: '#FF6A3D' }} title={`Ativos: ${v.ativos}`} />
+        <div style={{ width: `${(v.ativos / total) * 100}%`, background: '#FF7A21' }} title={`Ativos: ${v.ativos}`} />
         <div style={{ width: `${(v.ganhos / total) * 100}%`, background: '#34D399' }} title={`Ganhos: ${v.ganhos}`} />
         <div style={{ width: `${(v.perdidos / total) * 100}%`, background: '#F5544F' }} title={`Perdidos: ${v.perdidos}`} />
       </div>
       <div className="mt-2 flex items-center gap-3 text-[11px] text-ink-mute">
-        <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: '#FF6A3D' }} />{v.ativos} ativos</span>
+        <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: '#FF7A21' }} />{v.ativos} ativos</span>
         <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: '#34D399' }} />{v.ganhos} ganhos</span>
         <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: '#F5544F' }} />{v.perdidos} perdidos</span>
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <StatPill label="Conversão" value={pct(v.conversao)} color={v.conversao >= 50 ? '#34D399' : '#F5F5F4'} />
+        <StatPill label="Conversão" value={pct(v.conversao)} color={v.conversao >= 50 ? '#34D399' : '#F5F6FA'} />
         <StatPill label="Em aberto" value={moneyShort(v.emAberto)} />
         <StatPill label="Ticket" value={v.ganhos ? moneyShort(Math.round(v.receita / v.ganhos)) : '—'} />
       </div>

@@ -11,7 +11,7 @@ function dateLabel(l: Lead): { text: string; color: string } | null {
   const d = daysUntil(l.proximoFollowUp)
   if (d === null) return null
   if (d < 0) return { text: `${-d}d atrasado`, color: '#F5544F' }
-  if (d === 0) return { text: 'Hoje', color: '#FF6A3D' }
+  if (d === 0) return { text: 'Hoje', color: '#FF7A21' }
   if (d === 1) return { text: 'Amanhã', color: '#FBBF24' }
   return { text: formatDate(l.proximoFollowUp), color: d <= 7 ? '#38BDF8' : '#8B5CF6' }
 }

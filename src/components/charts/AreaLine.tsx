@@ -42,8 +42,8 @@ export function AreaLine({
   labels,
   format = (v) => String(Math.round(v)),
   height = 280,
-  color = '#FF4C24',
-  color2 = '#FF2D7E',
+  color = '#FD4E17',
+  color2 = '#FF7A21',
   yTicks = 4,
 }: Props) {
   const H = height
@@ -124,7 +124,7 @@ export function AreaLine({
         {ticks.map((t, i) => (
           <g key={i}>
             <line x1={padL} x2={W - padR} y1={t.y} y2={t.y} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-            <text x={padL - 10} y={t.y + 3} textAnchor="end" fontSize="10" fontFamily="'JetBrains Mono', monospace" fill="#6B6B72">
+            <text x={padL - 10} y={t.y + 3} textAnchor="end" fontSize="10" fontFamily="'JetBrains Mono', monospace" fill="#66738B">
               {format(t.val)}
             </text>
           </g>

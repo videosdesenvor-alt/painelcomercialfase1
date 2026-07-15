@@ -90,7 +90,7 @@ export function daysUntil(iso: string | null): number | null {
 
 /** Cores estáveis por vendedor (paleta da marca) */
 export const VENDEDOR_COLOR: Record<string, string> = {
-  Alessandra: '#FF4C24',
+  Alessandra: '#FD4E17',
   Débora: '#FF2D7E',
   André: '#38BDF8',
   Vitória: '#8B5CF6',
@@ -98,7 +98,7 @@ export const VENDEDOR_COLOR: Record<string, string> = {
 }
 
 const VENDEDOR_PALETTE = [
-  '#FF4C24', '#FF2D7E', '#38BDF8', '#8B5CF6', '#34D399',
+  '#FD4E17', '#FF2D7E', '#38BDF8', '#8B5CF6', '#34D399',
   '#FBBF24', '#12B8A6', '#F59E0B', '#EC4899', '#22D3EE',
 ]
 

@@ -4,18 +4,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Base surfaces (warm near-black → charcoal)
-        base: '#0B0B0C',
-        surface: '#131315',
-        elevated: '#1A1A1D',
-        card: '#202024',
-        hair: 'rgba(255,255,255,0.07)',
-        // Brand orange (vermilion) ramp
+        // Base surfaces — identidade Desenvor (Azul Profundo → Marinho)
+        base: '#00101F', // Azul Profundo (Black 6 C)
+        surface: '#011E40', // Marinho (282 C)
+        elevated: '#032748',
+        card: '#043057',
+        hair: 'rgba(255,255,255,0.08)',
+        // Laranja da marca (Primário / Secundário)
         ember: {
-          DEFAULT: '#FF4C24',
-          soft: '#FF6A3D',
-          deep: '#E8380F',
-          glow: '#FF7A45',
+          DEFAULT: '#FD4E17', // Laranja Primário (172 C)
+          soft: '#FF7A21', // Laranja Secundário (1575 C)
+          deep: '#D8400E',
+          glow: '#FF7A21',
         },
         // Secondary chart accent (pink/magenta like the reference)
         magenta: '#FF2D7E',
@@ -26,9 +26,9 @@ export default {
         warning: '#FBBF24',
         danger: '#F5544F',
         // Text
-        ink: '#F5F5F4',
-        'ink-sub': '#A6A6AD',
-        'ink-mute': '#6B6B72',
+        ink: '#F5F6FA',
+        'ink-sub': '#A7B2C6',
+        'ink-mute': '#66738B',
       },
       fontFamily: {
         display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
@@ -41,7 +41,7 @@ export default {
         '3xl': '24px',
       },
       boxShadow: {
-        glow: '0 0 0 1px rgba(255,76,36,0.35), 0 8px 40px -8px rgba(255,76,36,0.45)',
+        glow: '0 0 0 1px rgba(253,78,23,0.35), 0 8px 40px -8px rgba(253,78,23,0.45)',
         card: '0 1px 0 0 rgba(255,255,255,0.04) inset, 0 24px 48px -24px rgba(0,0,0,0.8)',
         lift: '0 20px 60px -20px rgba(0,0,0,0.9)',
       },
@@ -58,9 +58,9 @@ export default {
           '100%': { transform: 'translateX(100%)' },
         },
         'pulse-ring': {
-          '0%': { boxShadow: '0 0 0 0 rgba(255,76,36,0.5)' },
-          '70%': { boxShadow: '0 0 0 10px rgba(255,76,36,0)' },
-          '100%': { boxShadow: '0 0 0 0 rgba(255,76,36,0)' },
+          '0%': { boxShadow: '0 0 0 0 rgba(253,78,23,0.5)' },
+          '70%': { boxShadow: '0 0 0 10px rgba(253,78,23,0)' },
+          '100%': { boxShadow: '0 0 0 0 rgba(253,78,23,0)' },
         },
       },
       animation: {

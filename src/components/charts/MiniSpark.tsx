@@ -1,6 +1,6 @@
 export function MiniSpark({
   data,
-  color = '#FF4C24',
+  color = '#FD4E17',
   width = 108,
   height = 34,
 }: {

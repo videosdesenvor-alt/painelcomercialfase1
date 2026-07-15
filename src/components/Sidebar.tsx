@@ -54,7 +54,7 @@ export function Sidebar() {
                 <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-ember/20 to-ember/5 ring-1 ring-ember/30" />
               )}
               {active && (
-                <span className="absolute -left-3 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-ember shadow-[0_0_12px_2px_rgba(255,76,36,0.7)]" />
+                <span className="absolute -left-3 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-ember shadow-[0_0_12px_2px_rgba(253,78,23,0.7)]" />
               )}
               <Icon
                 size={19}

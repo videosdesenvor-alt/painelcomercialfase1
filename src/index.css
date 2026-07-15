@@ -21,8 +21,8 @@
   body {
     @apply bg-base text-ink font-sans;
     background-image:
-      radial-gradient(900px 500px at 78% -10%, rgba(255, 76, 36, 0.14), transparent 60%),
-      radial-gradient(700px 500px at 0% 0%, rgba(255, 45, 126, 0.08), transparent 55%);
+      radial-gradient(900px 500px at 78% -10%, rgba(253, 78, 23, 0.14), transparent 60%),
+      radial-gradient(700px 500px at 0% 0%, rgba(255, 122, 33, 0.07), transparent 55%);
     background-attachment: fixed;
   }
 
@@ -33,7 +33,7 @@
   }
 
   ::selection {
-    background: rgba(255, 76, 36, 0.32);
+    background: rgba(253, 78, 23, 0.32);
     color: #fff;
   }
 
@@ -53,7 +53,7 @@
     background-clip: content-box;
   }
   *::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 76, 36, 0.4);
+    background: rgba(253, 78, 23, 0.4);
     background-clip: content-box;
   }
 }
@@ -65,14 +65,14 @@
     background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
   }
 
-  /* Vidro translúcido — deixa a "imagem" atrás aparecer */
+  /* Vidro translúcido (tons Marinho / Azul Profundo) */
   .glass {
     @apply rounded-2xl border border-white/10 backdrop-blur-2xl;
-    background: rgba(15, 13, 18, 0.5);
+    background: rgba(1, 30, 64, 0.55);
   }
   .glass-hero {
     @apply rounded-3xl border border-white/10 backdrop-blur-2xl;
-    background: linear-gradient(180deg, rgba(24, 18, 26, 0.42), rgba(12, 11, 14, 0.72));
+    background: linear-gradient(180deg, rgba(2, 38, 80, 0.5), rgba(0, 16, 31, 0.78));
     box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
@@ -86,7 +86,7 @@
 
   /* Gradient text */
   .text-gradient {
-    background: linear-gradient(92deg, #ff7a45 0%, #ff4c24 45%, #ff2d7e 100%);
+    background: linear-gradient(92deg, #ff7a21 0%, #fd4e17 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -95,12 +95,12 @@
   /* Primary ember button */
   .btn-ember {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200;
-    background: linear-gradient(180deg, #ff6a3d, #ff4c24);
-    box-shadow: 0 8px 24px -8px rgba(255, 76, 36, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    background: linear-gradient(180deg, #ff7a21, #fd4e17);
+    box-shadow: 0 8px 24px -8px rgba(253, 78, 23, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
   .btn-ember:hover {
     filter: brightness(1.07);
-    box-shadow: 0 10px 30px -6px rgba(255, 76, 36, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 30px -6px rgba(253, 78, 23, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
   .btn-ember:active {
     transform: translateY(1px);
@@ -122,8 +122,8 @@
     outline: none;
   }
   .input:focus {
-    border-color: rgba(255, 76, 36, 0.55);
-    box-shadow: 0 0 0 3px rgba(255, 76, 36, 0.15);
+    border-color: rgba(253, 78, 23, 0.55);
+    box-shadow: 0 0 0 3px rgba(253, 78, 23, 0.15);
   }
 
   .label {
@@ -133,7 +133,7 @@
 
 @layer utilities {
   .br-state {
-    stroke: rgba(11, 11, 12, 0.85);
+    stroke: rgba(0, 16, 31, 0.85);
     stroke-width: 0.8;
     cursor: pointer;
     transition: filter 0.15s ease, stroke 0.15s ease;
@@ -141,9 +141,9 @@
   }
   .br-state:hover,
   .br-state:focus-visible {
-    stroke: #ff7a45;
+    stroke: #ff7a21;
     stroke-width: 1.6;
-    filter: brightness(1.18) drop-shadow(0 0 6px rgba(255, 76, 36, 0.5));
+    filter: brightness(1.18) drop-shadow(0 0 6px rgba(253, 78, 23, 0.5));
   }
 
   .grid-lines {

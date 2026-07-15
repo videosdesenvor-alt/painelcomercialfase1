@@ -21,7 +21,7 @@ export default function App() {
       {/* Aurora ambiente */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute right-[-6%] top-[-12%] h-[420px] w-[520px] rounded-full bg-ember/[0.10] blur-[120px] animate-aurora" />
-        <div className="absolute left-[10%] top-[30%] h-[360px] w-[360px] rounded-full bg-magenta/[0.06] blur-[130px]" />
+        <div className="absolute left-[10%] top-[30%] h-[360px] w-[360px] rounded-full bg-ember-soft/[0.07] blur-[130px]" />
       </div>
 
       <Sidebar />

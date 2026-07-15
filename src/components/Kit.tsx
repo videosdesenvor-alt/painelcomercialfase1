@@ -28,7 +28,7 @@ export function KpiCard({
   delta,
   deltaUp,
   spark,
-  color = '#FF4C24',
+  color = '#FD4E17',
   glow = false,
   icon: Icon,
 }: {

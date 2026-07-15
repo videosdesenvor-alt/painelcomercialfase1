@@ -28,7 +28,7 @@ export function BrazilMap({
       {BR_STATES.map((s) => {
         const n = counts[s.uf] ?? 0
         const t = max > 0 ? n / max : 0
-        const fill = n === 0 ? 'rgba(255,255,255,0.045)' : `rgba(255,76,36,${(0.16 + t * 0.74).toFixed(3)})`
+        const fill = n === 0 ? 'rgba(255,255,255,0.045)' : `rgba(253,78,23,${(0.16 + t * 0.74).toFixed(3)})`
         return (
           <path
             key={s.uf}

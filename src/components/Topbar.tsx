@@ -53,7 +53,7 @@ export function Topbar() {
           aria-label="Notificações"
         >
           <Bell size={18} />
-          <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-ember shadow-[0_0_8px_2px_rgba(255,76,36,0.8)]" />
+          <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-ember shadow-[0_0_8px_2px_rgba(253,78,23,0.8)]" />
         </button>
 
         <button onClick={() => openEditor(null)} className="btn-ember shrink-0 whitespace-nowrap">

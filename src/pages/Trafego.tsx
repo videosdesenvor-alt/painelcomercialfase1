@@ -8,7 +8,7 @@ import { PageTitle } from '../components/Kit'
 import { Donut } from '../components/charts/Donut'
 import { TrafegoEditor } from '../components/TrafegoEditor'
 
-const CANAL_COLORS = ['#FF4C24', '#FF2D7E', '#38BDF8', '#8B5CF6', '#34D399', '#FBBF24']
+const CANAL_COLORS = ['#FD4E17', '#FF2D7E', '#38BDF8', '#8B5CF6', '#34D399', '#FBBF24']
 const canalColor = (i: number) => CANAL_COLORS[i % CANAL_COLORS.length]
 
 function KpiBig({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
@@ -80,7 +80,7 @@ export function Trafego() {
                 )}
               >
                 {label}
-                {tab === id && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-ember shadow-[0_0_10px_1px_rgba(255,76,36,0.7)]" />}
+                {tab === id && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-ember shadow-[0_0_10px_1px_rgba(253,78,23,0.7)]" />}
               </button>
             ))}
           </div>
