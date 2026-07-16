@@ -1,98 +1,124 @@
-import { LayoutDashboard, CalendarCheck, Contact, Users, Sparkles, Settings } from 'lucide-react'
-import { useUI, useData, type Page } from '../lib/store'
-import { cn } from '../lib/utils'
-import { BRAND } from '../lib/brand'
+import { LayoutDashboard, CalendarCheck, Contact, Users, Sparkles } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useUI, useData, type Page } from '@/lib/store'
+import { cn } from '@/lib/utils'
+import { BRAND } from '@/lib/brand'
 import { Logo } from './Logo'
 import { Avatar } from './Avatar'
+import { Sidebar as SidebarRoot, DesktopSidebar, SidebarLink, useSidebar } from './ui/sidebar'
 
-const NAV: { id: Page; label: string; icon: typeof LayoutDashboard; hint: string }[] = [
-  { id: 'dashboard', label: 'Visão Geral', icon: LayoutDashboard, hint: 'KPIs e desempenho' },
-  { id: 'followup', label: 'Follow-up', icon: CalendarCheck, hint: 'Contatos agendados' },
-  { id: 'leads', label: 'Clientes', icon: Contact, hint: 'Base de leads' },
-  { id: 'equipe', label: 'Equipe', icon: Users, hint: 'Vendedores' },
+/** Larguras do rail recolhido e da sidebar expandida (px) */
+export const RAIL = 68
+export const EXPANDED = 268
+
+const NAV: { id: Page; label: string; icon: typeof LayoutDashboard }[] = [
+  { id: 'dashboard', label: 'Visão Geral', icon: LayoutDashboard },
+  { id: 'followup', label: 'Follow-up', icon: CalendarCheck },
+  { id: 'leads', label: 'Clientes', icon: Contact },
+  { id: 'equipe', label: 'Equipe', icon: Users },
 ]
 
-function Brand() {
-  const empresa = useData((s) => s.perfil.empresa) || BRAND.name
+/** Texto que some quando o rail está recolhido */
+function Reveal({ children, className }: { children: React.ReactNode; className?: string }) {
+  const { open } = useSidebar()
   return (
-    <div className="flex items-center gap-3 px-3">
-      <Logo size={40} />
-      <div className="min-w-0 leading-tight">
-        <div className="truncate font-display text-[15px] font-bold text-ink">{empresa}</div>
-        <div className="text-[11px] font-medium text-ink-mute">{BRAND.tagline}</div>
-      </div>
-    </div>
+    <motion.div
+      initial={false}
+      animate={{ opacity: open ? 1 : 0, display: open ? 'block' : 'none' }}
+      transition={{ duration: 0.15 }}
+      className={cn('min-w-0 whitespace-pre', className)}
+    >
+      {children}
+    </motion.div>
   )
 }
 
-export function Sidebar() {
+function SidebarInner() {
   const { page, setPage } = useUI()
   const perfil = useData((s) => s.perfil)
+  const empresa = useData((s) => s.perfil.empresa) || BRAND.name
+
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-[248px] flex-col border-r border-hair bg-surface/70 backdrop-blur-xl lg:flex">
-      <div className="flex h-[68px] items-center">
-        <Brand />
+    <>
+      {/* Marca */}
+      <div className="flex h-[68px] shrink-0 items-center gap-3">
+        <Logo size={40} className="shrink-0" />
+        <Reveal className="leading-tight">
+          <div className="truncate font-display text-[15px] font-bold text-ink">{empresa}</div>
+          <div className="text-[11px] font-medium text-ink-mute">{BRAND.tagline}</div>
+        </Reveal>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 px-3 py-3">
-        <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-mute">
+      {/* Navegação */}
+      <nav className="flex flex-1 flex-col gap-1 py-3">
+        <Reveal className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-mute">
           Operação
-        </div>
+        </Reveal>
         {NAV.map((n) => {
           const active = page === n.id
           const Icon = n.icon
           return (
-            <button
+            <SidebarLink
               key={n.id}
-              onClick={() => setPage(n.id)}
+              title={n.label}
+              link={{
+                label: n.label,
+                onClick: () => setPage(n.id),
+                icon: <Icon size={19} className={cn('shrink-0', active ? 'text-ember' : 'text-ink-mute')} />,
+              }}
               className={cn(
-                'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200',
-                active ? 'text-white' : 'text-ink-sub hover:text-ink hover:bg-white/[0.04]',
+                'relative rounded-xl px-3 transition-colors',
+                active
+                  ? 'bg-gradient-to-r from-ember/20 to-ember/5 font-semibold text-white ring-1 ring-ember/30 before:absolute before:-left-3 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-ember before:shadow-[0_0_12px_2px_rgba(253,78,23,0.7)]'
+                  : 'font-semibold text-ink-sub hover:bg-white/[0.04] hover:text-ink',
               )}
-            >
-              {active && (
-                <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-ember/20 to-ember/5 ring-1 ring-ember/30" />
-              )}
-              {active && (
-                <span className="absolute -left-3 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-ember shadow-[0_0_12px_2px_rgba(253,78,23,0.7)]" />
-              )}
-              <Icon
-                size={19}
-                className={cn('relative shrink-0', active ? 'text-ember' : 'text-ink-mute group-hover:text-ink-sub')}
-              />
-              <span className="relative flex-1 text-left">{n.label}</span>
-            </button>
+            />
           )
         })}
       </nav>
 
-      <div className="space-y-2 border-t border-hair p-3">
-        <button
-          onClick={() => setPage('perfil')}
+      {/* Rodapé: perfil + meta */}
+      <div className="shrink-0 space-y-2 border-t border-hair py-3">
+        <SidebarLink
+          title="Ver perfil"
+          link={{
+            label: perfil.nome,
+            onClick: () => setPage('perfil'),
+            icon: <Avatar name={perfil.nome} size="sm" src={perfil.foto} />,
+          }}
           className={cn(
-            'flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition-colors',
-            page === 'perfil' ? 'bg-white/[0.06] ring-1 ring-ember/25' : 'bg-white/[0.02] hover:bg-white/[0.05]',
+            'rounded-xl px-2 text-xs font-semibold',
+            page === 'perfil'
+              ? 'bg-white/[0.06] text-ink ring-1 ring-ember/25'
+              : 'text-ink-sub hover:bg-white/[0.05] hover:text-ink',
           )}
-        >
-          <Avatar name={perfil.nome} size="sm" src={perfil.foto} />
-          <div className="min-w-0 flex-1 leading-tight">
-            <div className="truncate text-xs font-semibold text-ink">{perfil.nome}</div>
-            <div className="text-[10px] text-ink-mute">Ver perfil</div>
-          </div>
-          <Settings size={15} className={cn('shrink-0', page === 'perfil' ? 'text-ember' : 'text-ink-mute')} />
-        </button>
+        />
 
-        <div className="flex items-center gap-3 rounded-xl bg-white/[0.02] p-3">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-ember/25 to-transparent ring-1 ring-ember/25">
-            <Sparkles size={16} className="text-ember" />
+        <div className="flex items-center gap-2 rounded-xl bg-white/[0.02] px-2 py-2" title="Meta do mês">
+          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-ember/25 to-transparent ring-1 ring-ember/25">
+            <Sparkles size={15} className="text-ember" />
           </div>
-          <div className="min-w-0 flex-1 leading-tight">
+          <Reveal className="leading-tight">
             <div className="truncate text-xs font-semibold text-ink">Meta do mês</div>
             <div className="text-[11px] text-ink-mute">Bata R$ 250 mil</div>
-          </div>
+          </Reveal>
         </div>
       </div>
-    </aside>
+    </>
+  )
+}
+
+export function Sidebar() {
+  return (
+    <SidebarRoot>
+      <DesktopSidebar
+        widthOpen={EXPANDED}
+        widthClosed={RAIL}
+        className="fixed inset-y-0 left-0 z-30 hidden overflow-hidden border-r border-hair bg-surface/70 !px-3 !py-0 backdrop-blur-xl lg:flex"
+      >
+        <SidebarInner />
+      </DesktopSidebar>
+    </SidebarRoot>
   )
 }
 

@@ -26,7 +26,8 @@ export default function App() {
 
       <Sidebar />
 
-      <div className="lg:pl-[248px]">
+      {/* padding = largura do rail; a sidebar expande por cima ao passar o mouse */}
+      <div className="lg:pl-[68px]">
         <Topbar />
         <main className="mx-auto w-full max-w-[1360px] px-4 pb-28 pt-5 sm:px-6 lg:pb-10">
           <div key={page} className="animate-fade-up">
