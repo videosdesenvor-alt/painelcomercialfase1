@@ -247,7 +247,7 @@ export function Trafego() {
           />
           <KpiBig label="Retorno (vendas)" value={money(k.retorno)} sub={`${num(k.vendas)} vendas concluídas`} />
           <KpiBig label="Lucro" value={money(k.lucro)} tone={k.lucro >= 0 ? 'positive' : 'danger'} sub="retorno − investimento" />
-          <KpiBig label="ROAS" value={`${dec2(k.roas)}×`} tone="ember" sub="retorno / mídia" />
+          <KpiBig label="ROAS" value={`${dec2(k.roas)}×`} tone="ember" sub="retorno / (mídia + honorários)" />
         </div>
       </div>
 

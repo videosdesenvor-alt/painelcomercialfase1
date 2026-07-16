@@ -310,15 +310,16 @@ export function serieReceita(leads: Lead[], dias = 30): number[] {
 
 /* ── Tráfego pago ──
    Gasto manual (lançamentos mensais: mídia + honorários) × retorno real do
-   funil (leads marcados `origemTrafego`). Convenções de mercado:
-   ROAS considera só a mídia; ROI e CAC consideram o investimento total. */
+   funil (leads marcados `origemTrafego`). Decisão do usuário: TODAS as
+   métricas (ROAS incluso) usam o investimento total (mídia + honorários) —
+   é o que sai do caixa do cliente. */
 export interface TrafegoResumo {
   investido: number // mídia
   honorarios: number // agência
   investimentoTotal: number
   retorno: number // receita dos clientes de tráfego em "Venda concluída"
   lucro: number // retorno − investimento total
-  roas: number // retorno / mídia
+  roas: number // retorno / investimento total (mídia + honorários)
   roi: number // lucro / investimento total
   cac: number // investimento total / vendas
   custoLead: number // investimento total / leads
@@ -380,7 +381,7 @@ export function computeTrafegoResumo(
     investimentoTotal,
     retorno,
     lucro,
-    roas: investido ? retorno / investido : 0,
+    roas: investimentoTotal ? retorno / investimentoTotal : 0,
     roi: investimentoTotal ? lucro / investimentoTotal : 0,
     cac: vendas ? investimentoTotal / vendas : 0,
     custoLead: nLeads ? investimentoTotal / nLeads : 0,

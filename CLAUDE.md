@@ -101,8 +101,9 @@ src/
   lançamentos mensais (`TrafegoLancamento`: mês `YYYY-MM`, investido em mídia,
   honorários da agência; 1 por mês, `addLancamento` bloqueia duplicata). O
   RETORNO vem do funil: leads com `origemTrafego: true` (chave "Cliente de
-  tráfego" no `LeadEditor`). ROAS = retorno/mídia; ROI e CAC usam o
-  investimento total (mídia + honorários). Cálculos em
+  tráfego" no `LeadEditor`). **Todas as métricas — ROAS incluso — usam o
+  investimento total (mídia + honorários)**; decisão do usuário, é o que sai
+  do caixa do cliente. Cálculos em
   `computeTrafegoResumo`/`trafegoPorMes` (analytics), filtráveis por
   `PeriodoMes` (De/Até em 'YYYY-MM'; padrão da página = mês atual). Leads/em
   aberto contam pelo mês de criação; vendas/retorno pelo mês de fechamento.
