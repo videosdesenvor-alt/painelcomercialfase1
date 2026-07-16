@@ -30,10 +30,13 @@ export default {
         'ink-sub': '#A7B2C6',
         'ink-mute': '#66738B',
       },
+      // Fonte única da marca: Manrope. As chaves display/mono continuam
+      // existindo (as classes font-display / font-mono seguem válidas),
+      // mas todas resolvem para Manrope.
       fontFamily: {
-        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+        display: ['Manrope', 'system-ui', 'sans-serif'],
         sans: ['Manrope', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        mono: ['Manrope', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         xl: '14px',

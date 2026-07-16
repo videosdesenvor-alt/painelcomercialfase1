@@ -58,7 +58,7 @@ export function BrazilMap({
             dominantBaseline="central"
             className="pointer-events-none select-none"
             style={{
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Manrope', sans-serif",
               fontSize: t > 0.35 ? 17 : 14,
               fontWeight: 700,
               fill: '#fff',
