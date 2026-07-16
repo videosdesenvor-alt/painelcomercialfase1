@@ -122,7 +122,7 @@ export function LeadEditor() {
       notify('Cliente atualizado')
     } else {
       addLead(payload)
-      notify('Novo lead adicionado ao funil')
+      notify('Nova venda adicionada ao funil')
     }
     closeEditor()
   }
@@ -135,7 +135,7 @@ export function LeadEditor() {
         <div className="flex items-center justify-between border-b border-hair px-6 py-4">
           <div>
             <h2 className="font-display text-lg font-bold text-ink">
-              {editing ? 'Editar cliente' : 'Novo lead'}
+              {editing ? 'Editar cliente' : 'Nova venda'}
             </h2>
             <p className="text-xs text-ink-mute">
               {editing ? 'Atualize os dados e o estágio do funil' : 'Cadastre e já posicione no funil'}
@@ -228,7 +228,7 @@ export function LeadEditor() {
         {/* footer */}
         <div className="flex items-center justify-end gap-3 border-t border-hair px-6 py-4">
           <button onClick={closeEditor} className="btn-ghost">Cancelar</button>
-          <button onClick={save} className="btn-ember">{editing ? 'Salvar alterações' : 'Adicionar lead'}</button>
+          <button onClick={save} className="btn-ember">{editing ? 'Salvar alterações' : 'Adicionar venda'}</button>
         </div>
       </div>
     </div>

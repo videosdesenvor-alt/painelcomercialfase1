@@ -89,7 +89,7 @@ export function Leads() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <PageTitle title="Clientes & Leads" sub={`${leads.length} cadastros na base comercial`} />
         <button onClick={() => openEditor(null)} className="btn-ember self-start sm:self-auto">
-          <Plus size={16} strokeWidth={2.5} /> Novo lead
+          <Plus size={16} strokeWidth={2.5} /> Nova venda
         </button>
       </div>
 

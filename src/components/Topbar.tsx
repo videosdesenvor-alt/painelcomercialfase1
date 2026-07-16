@@ -61,7 +61,7 @@ export function Topbar() {
 
         <button onClick={() => openEditor(null)} className="btn-ember shrink-0 whitespace-nowrap">
           <Plus size={17} strokeWidth={2.5} />
-          <span className="hidden sm:inline">Novo lead</span>
+          <span className="hidden sm:inline">Nova venda</span>
         </button>
 
         <button

@@ -106,7 +106,7 @@ export function Dashboard() {
                     <Download size={14} /> Exportar
                   </button>
                   <button onClick={() => openEditor(null)} className="btn-ember py-2 text-xs">
-                    <Plus size={15} strokeWidth={2.5} /> Novo lead
+                    <Plus size={15} strokeWidth={2.5} /> Nova venda
                   </button>
                 </div>
               </div>
@@ -238,7 +238,7 @@ export function Dashboard() {
                 Ver leads
               </button>
               <button onClick={() => openEditor(null)} className="btn-ember justify-center py-2.5 text-sm">
-                Novo lead
+                Nova venda
               </button>
             </div>
           </div>
