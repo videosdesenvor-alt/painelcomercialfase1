@@ -16,11 +16,16 @@ import { uid } from './utils'
 /* ────────────────────────────────────────────────────────────
    Camada de dados (persistida no navegador — trocável por API)
    ──────────────────────────────────────────────────────────── */
+export type Tema = 'light' | 'dark'
+
 interface DataState {
   leads: Lead[]
   vendedores: string[]
   trafego: TrafegoEntry[]
   perfil: Perfil
+  tema: Tema
+  setTema: (t: Tema) => void
+  toggleTema: () => void
   setPerfil: (patch: Partial<Perfil>) => void
   resetPerfil: () => void
   addLead: (input: NovoLead) => string
@@ -44,6 +49,10 @@ export const useData = create<DataState>()(
         { id: 'tf_google', canal: 'Google Ads', investido: 6261.5, faturado: 152388, leads: 460, vendas: 112 },
       ],
       perfil: PERFIL_PADRAO,
+      tema: 'dark',
+
+      setTema: (tema) => set({ tema }),
+      toggleTema: () => set((s) => ({ tema: s.tema === 'dark' ? 'light' : 'dark' })),
 
       setPerfil: (patch) => set((s) => ({ perfil: { ...s.perfil, ...patch } })),
       resetPerfil: () => set({ perfil: PERFIL_PADRAO }),

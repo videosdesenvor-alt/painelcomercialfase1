@@ -3,8 +3,73 @@
 @tailwind utilities;
 
 @layer base {
+  /* ───────────────────────────────────────────────────────────────
+     TEMAS — identidade Desenvor.
+     Claro: Gelo (#F5F6FA) de fundo, Azul Profundo no texto.
+     Escuro: Azul Profundo de fundo, Marinho nos painéis, Gelo no texto.
+     Os canais RGB ficam separados por espaço para o Tailwind aplicar
+     opacidade (bg-surface/80). Cores com alpha própria vão inteiras.
+     ─────────────────────────────────────────────────────────────── */
   :root {
+    color-scheme: light;
+
+    --base: 245 246 250; /* Gelo */
+    --surface: 255 255 255;
+    --elevated: 255 255 255;
+    --card: 250 251 253;
+
+    --ink: 0 16 31; /* Azul Profundo */
+    --ink-sub: 74 90 112;
+    --ink-mute: 122 134 153;
+
+    --hair: rgba(0, 16, 31, 0.1);
+    --hair-strong: rgba(0, 16, 31, 0.18);
+    --overlay: rgba(0, 16, 31, 0.035);
+    --overlay-2: rgba(0, 16, 31, 0.07);
+
+    --sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+    --glass: rgba(255, 255, 255, 0.72);
+    --glass-hero: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(245, 246, 250, 0.72));
+    --glass-shadow: 0 24px 60px -30px rgba(0, 16, 31, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    --grid: rgba(0, 16, 31, 0.08);
+    --map-empty: rgba(0, 16, 31, 0.06);
+    --map-stroke: rgba(245, 246, 250, 0.95);
+    --scroll-thumb: rgba(0, 16, 31, 0.18);
+
+    --glow-1: rgba(253, 78, 23, 0.08);
+    --glow-2: rgba(255, 122, 33, 0.05);
+  }
+
+  .dark {
     color-scheme: dark;
+
+    --base: 0 16 31; /* Azul Profundo */
+    --surface: 1 30 64; /* Marinho */
+    --elevated: 3 39 72;
+    --card: 4 48 87;
+
+    --ink: 245 246 250; /* Gelo */
+    --ink-sub: 167 178 198;
+    --ink-mute: 102 115 139;
+
+    --hair: rgba(255, 255, 255, 0.08);
+    --hair-strong: rgba(255, 255, 255, 0.16);
+    --overlay: rgba(255, 255, 255, 0.025);
+    --overlay-2: rgba(255, 255, 255, 0.055);
+
+    --sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
+    --glass: rgba(1, 30, 64, 0.55);
+    --glass-hero: linear-gradient(180deg, rgba(2, 38, 80, 0.5), rgba(0, 16, 31, 0.78));
+    --glass-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    --grid: rgba(255, 255, 255, 0.05);
+    --map-empty: rgba(255, 255, 255, 0.045);
+    --map-stroke: rgba(0, 16, 31, 0.85);
+    --scroll-thumb: rgba(255, 255, 255, 0.12);
+
+    --glow-1: rgba(253, 78, 23, 0.14);
+    --glow-2: rgba(255, 122, 33, 0.07);
   }
 
   * {
@@ -21,9 +86,11 @@
   body {
     @apply bg-base text-ink font-sans;
     background-image:
-      radial-gradient(900px 500px at 78% -10%, rgba(253, 78, 23, 0.14), transparent 60%),
-      radial-gradient(700px 500px at 0% 0%, rgba(255, 122, 33, 0.07), transparent 55%);
+      radial-gradient(900px 500px at 78% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(700px 500px at 0% 0%, var(--glow-2), transparent 55%);
     background-attachment: fixed;
+    /* Sem transition aqui de propósito: transicionar cores que vêm de CSS
+       variables faz o Chrome congelar no valor do tema anterior. */
   }
 
   /* Tabular figures everywhere numbers matter */
@@ -40,14 +107,14 @@
   /* Scrollbars */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+    scrollbar-color: var(--scroll-thumb) transparent;
   }
   *::-webkit-scrollbar {
     width: 9px;
     height: 9px;
   }
   *::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--scroll-thumb);
     border-radius: 999px;
     border: 2px solid transparent;
     background-clip: content-box;
@@ -62,25 +129,25 @@
   /* Frosted card surface */
   .panel {
     @apply rounded-2xl border border-hair bg-surface/80 backdrop-blur-xl;
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
+    background-image: var(--sheen);
   }
 
-  /* Vidro translúcido (tons Marinho / Azul Profundo) */
+  /* Vidro translúcido */
   .glass {
-    @apply rounded-2xl border border-white/10 backdrop-blur-2xl;
-    background: rgba(1, 30, 64, 0.55);
+    @apply rounded-2xl border border-hair-strong backdrop-blur-2xl;
+    background: var(--glass);
   }
   .glass-hero {
-    @apply rounded-3xl border border-white/10 backdrop-blur-2xl;
-    background: linear-gradient(180deg, rgba(2, 38, 80, 0.5), rgba(0, 16, 31, 0.78));
-    box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    @apply rounded-3xl border border-hair-strong backdrop-blur-2xl;
+    background: var(--glass-hero);
+    box-shadow: var(--glass-shadow);
   }
 
   .panel-hover {
     @apply transition-all duration-300;
   }
   .panel-hover:hover {
-    border-color: rgba(255, 255, 255, 0.14);
+    border-color: var(--hair-strong);
     transform: translateY(-2px);
   }
 
@@ -107,18 +174,18 @@
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-hair bg-white/[0.02] px-4 py-2.5 text-sm font-semibold text-ink-sub transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-hair bg-overlay px-4 py-2.5 text-sm font-semibold text-ink-sub transition-all duration-200;
   }
   .btn-ghost:hover {
-    @apply border-white/20 text-ink bg-white/[0.05];
+    @apply border-hair-strong bg-overlay-2 text-ink;
   }
 
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-lg border border-hair bg-white/[0.02] px-2.5 py-1 text-xs font-medium text-ink-sub;
+    @apply inline-flex items-center gap-1.5 rounded-lg border border-hair bg-overlay px-2.5 py-1 text-xs font-medium text-ink-sub;
   }
 
   .input {
-    @apply w-full rounded-xl border border-hair bg-white/[0.02] px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-mute transition-colors;
+    @apply w-full rounded-xl border border-hair bg-overlay px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-mute transition-colors;
     outline: none;
   }
   .input:focus {
@@ -133,7 +200,7 @@
 
 @layer utilities {
   .br-state {
-    stroke: rgba(0, 16, 31, 0.85);
+    stroke: var(--map-stroke);
     stroke-width: 0.8;
     cursor: pointer;
     transition: filter 0.15s ease, stroke 0.15s ease;
@@ -148,8 +215,8 @@
 
   .grid-lines {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
     background-size: 28px 28px;
   }
   .no-scrollbar::-webkit-scrollbar {

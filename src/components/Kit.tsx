@@ -113,7 +113,7 @@ export function BarStat({
             {suffix}
           </span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-white/[0.05]">
+        <div className="h-2 overflow-hidden rounded-full bg-overlay-2">
           <div
             className="h-full rounded-full transition-all duration-700"
             style={{ width: `${pctW}%`, background: `linear-gradient(90deg, ${color}, ${color}bb)` }}

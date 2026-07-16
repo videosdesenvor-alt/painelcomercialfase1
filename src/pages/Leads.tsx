@@ -140,7 +140,7 @@ export function Leads() {
       {/* Resultado */}
       {rows.length === 0 ? (
         <div className="panel grid place-items-center px-6 py-16 text-center">
-          <div className="grid h-14 w-14 place-items-center rounded-2xl border border-hair bg-white/[0.02] text-ink-mute">
+          <div className="grid h-14 w-14 place-items-center rounded-2xl border border-hair bg-overlay text-ink-mute">
             <Inbox size={24} />
           </div>
           <h3 className="mt-4 font-display text-lg font-bold text-ink">Nenhum lead encontrado</h3>
@@ -215,14 +215,14 @@ function FollowCell({ lead }: { lead: Lead }) {
 
 function Row({ lead, onClick }: { lead: Lead; onClick: () => void }) {
   return (
-    <tr onClick={onClick} className="cursor-pointer border-b border-hair/60 transition-colors last:border-0 hover:bg-white/[0.025]">
+    <tr onClick={onClick} className="cursor-pointer border-b border-hair/60 transition-colors last:border-0 hover:bg-overlay">
       <td className="px-4 py-3">
         <div className="font-semibold text-ink">{lead.cliente}</div>
         <div className="text-[11px] text-ink-mute">#{lead.numero} · {lead.produto}</div>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="grid h-6 w-7 place-items-center rounded-md border border-hair bg-white/[0.02] font-mono text-[10px] font-bold text-ember">
+          <span className="grid h-6 w-7 place-items-center rounded-md border border-hair bg-overlay font-mono text-[10px] font-bold text-ember">
             {lead.estado}
           </span>
           <span className="text-ink-sub">{lead.cidade || UF_NOME[lead.estado]}</span>

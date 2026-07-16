@@ -8,7 +8,7 @@ import { money, formatDateLong, timeAgoFull, UF_NOME, cn, daysUntil } from '../l
 function InfoRow({ icon: Icon, label, value }: { icon: typeof Phone; label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 py-2.5">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-hair bg-white/[0.02] text-ink-mute">
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-hair bg-overlay text-ink-mute">
         <Icon size={16} />
       </div>
       <div className="min-w-0">
@@ -104,9 +104,9 @@ export function LeadDetail() {
                         notify(`Movido para "${m.short}"`, 'info')
                       }
                     }}
-                    className={cn('rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-all', active ? 'text-white' : 'text-ink-sub hover:text-ink')}
+                    className={cn('rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-all', active ? 'text-ink' : 'text-ink-sub hover:text-ink')}
                     style={{
-                      borderColor: active ? m.color + '66' : 'rgba(255,255,255,0.07)',
+                      borderColor: active ? m.color + '66' : 'var(--hair)',
                       background: active ? m.color + '22' : 'transparent',
                     }}
                   >
@@ -118,7 +118,7 @@ export function LeadDetail() {
           </div>
 
           {/* Dados */}
-          <div className="mt-5 rounded-2xl border border-hair bg-white/[0.02] px-4">
+          <div className="mt-5 rounded-2xl border border-hair bg-overlay px-4">
             <InfoRow icon={Phone} label="Telefone" value={lead.telefone || '—'} />
             <div className="border-t border-hair" />
             <InfoRow icon={MapPin} label="Localização" value={`${lead.cidade || '—'} · ${UF_NOME[lead.estado]}`} />

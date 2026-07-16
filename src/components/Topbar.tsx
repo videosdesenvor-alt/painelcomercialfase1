@@ -2,6 +2,7 @@ import { Search, Plus, Bell, Command } from 'lucide-react'
 import { useUI, useData } from '../lib/store'
 import { Avatar } from './Avatar'
 import { Logo } from './Logo'
+import { ThemeToggle } from './ThemeToggle'
 
 const HOJE = new Date().toLocaleDateString('pt-BR', {
   weekday: 'long',
@@ -48,8 +49,10 @@ export function Topbar() {
         </div>
 
         {/* Ações */}
+        <ThemeToggle />
+
         <button
-          className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-hair bg-white/[0.02] text-ink-sub transition-colors hover:text-ink"
+          className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-hair bg-overlay text-ink-sub transition-colors hover:text-ink"
           aria-label="Notificações"
         >
           <Bell size={18} />
@@ -64,7 +67,7 @@ export function Topbar() {
         <button
           onClick={() => setPage('perfil')}
           title="Perfil"
-          className="flex shrink-0 items-center gap-2.5 rounded-xl border border-hair bg-white/[0.02] p-1.5 transition-colors hover:border-white/20 sm:pr-3"
+          className="flex shrink-0 items-center gap-2.5 rounded-xl border border-hair bg-overlay p-1.5 transition-colors hover:border-hair-strong sm:pr-3"
         >
           <Avatar name={perfil.nome} size="sm" src={perfil.foto} />
           <div className="hidden text-left leading-tight sm:block">

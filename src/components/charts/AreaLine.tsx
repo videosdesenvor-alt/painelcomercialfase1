@@ -123,8 +123,8 @@ export function AreaLine({
         {/* Y gridlines + labels */}
         {ticks.map((t, i) => (
           <g key={i}>
-            <line x1={padL} x2={W - padR} y1={t.y} y2={t.y} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-            <text x={padL - 10} y={t.y + 3} textAnchor="end" fontSize="10" fontFamily="'Manrope', sans-serif" fill="#66738B">
+            <line x1={padL} x2={W - padR} y1={t.y} y2={t.y} style={{ stroke: 'var(--grid)' }} strokeWidth="1" />
+            <text x={padL - 10} y={t.y + 3} textAnchor="end" fontSize="10" fontFamily="'Manrope', sans-serif" style={{ fill: 'rgb(var(--ink-mute))' }}>
               {format(t.val)}
             </text>
           </g>
@@ -142,8 +142,8 @@ export function AreaLine({
         {/* Ponto + guia */}
         {hp && (
           <>
-            <line x1={hp.x} x2={hp.x} y1={padT - 6} y2={H - padB} stroke="rgba(255,255,255,0.22)" strokeWidth="1" />
-            <circle cx={hp.x} cy={hp.y} r="6.5" fill="#fff" stroke={color} strokeWidth="3" />
+            <line x1={hp.x} x2={hp.x} y1={padT - 6} y2={H - padB} style={{ stroke: 'var(--hair-strong)' }} strokeWidth="1" />
+            <circle cx={hp.x} cy={hp.y} r="6.5" style={{ fill: 'rgb(var(--surface))' }} stroke={color} strokeWidth="3" />
             <circle cx={hp.x} cy={hp.y} r="13" fill="none" stroke={color} strokeOpacity="0.35" strokeWidth="1.5" />
           </>
         )}

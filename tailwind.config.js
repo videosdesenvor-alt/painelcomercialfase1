@@ -1,16 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // Base surfaces — identidade Desenvor (Azul Profundo → Marinho)
-        base: '#00101F', // Azul Profundo (Black 6 C)
-        surface: '#011E40', // Marinho (282 C)
-        elevated: '#032748',
-        card: '#043057',
-        hair: 'rgba(255,255,255,0.08)',
-        // Laranja da marca (Primário / Secundário)
+        /* Superfícies e texto vêm de CSS variables (ver index.css) e trocam
+           entre claro/escuro. Os canais RGB ficam separados por espaço para
+           o Tailwind poder aplicar opacidade: bg-surface/80 etc. */
+        base: 'rgb(var(--base) / <alpha-value>)',
+        surface: 'rgb(var(--surface) / <alpha-value>)',
+        elevated: 'rgb(var(--elevated) / <alpha-value>)',
+        card: 'rgb(var(--card) / <alpha-value>)',
+        // Bordas e preenchimentos sutis (já incluem alpha próprio)
+        hair: 'var(--hair)',
+        'hair-strong': 'var(--hair-strong)',
+        overlay: 'var(--overlay)',
+        'overlay-2': 'var(--overlay-2)',
+        // Laranja da marca (fixo nos dois temas)
         ember: {
           DEFAULT: '#FD4E17', // Laranja Primário (172 C)
           soft: '#FF7A21', // Laranja Secundário (1575 C)
@@ -25,10 +32,10 @@ export default {
         positive: '#34D399',
         warning: '#FBBF24',
         danger: '#F5544F',
-        // Text
-        ink: '#F5F6FA',
-        'ink-sub': '#A7B2C6',
-        'ink-mute': '#66738B',
+        // Texto (troca por tema)
+        ink: 'rgb(var(--ink) / <alpha-value>)',
+        'ink-sub': 'rgb(var(--ink-sub) / <alpha-value>)',
+        'ink-mute': 'rgb(var(--ink-mute) / <alpha-value>)',
       },
       // Fonte única da marca: Manrope. As chaves display/mono continuam
       // existindo (as classes font-display / font-mono seguem válidas),

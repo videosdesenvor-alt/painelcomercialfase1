@@ -8,7 +8,7 @@ import { PageTitle, CardHead } from '../components/Kit'
 
 function StatPill({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div className="rounded-xl border border-hair bg-white/[0.02] px-3 py-2.5">
+    <div className="rounded-xl border border-hair bg-overlay px-3 py-2.5">
       <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-mute">{label}</div>
       <div className="mt-0.5 font-display text-lg font-bold tnum" style={{ color: color ?? '#F5F6FA' }}>
         {value}
@@ -46,7 +46,7 @@ function VendedorCard({ v, rank, maxReceita }: { v: VendedorAgg; rank: number; m
       </div>
 
       {/* barra composição */}
-      <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-white/[0.05]">
+      <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-overlay-2">
         <div style={{ width: `${(v.ativos / total) * 100}%`, background: '#FF7A21' }} title={`Ativos: ${v.ativos}`} />
         <div style={{ width: `${(v.ganhos / total) * 100}%`, background: '#34D399' }} title={`Ganhos: ${v.ganhos}`} />
         <div style={{ width: `${(v.perdidos / total) * 100}%`, background: '#F5544F' }} title={`Perdidos: ${v.perdidos}`} />

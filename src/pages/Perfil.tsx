@@ -88,7 +88,7 @@ export function Perfil() {
         <CardHead title="Empresa" sub="Nome e logo exibidos na marca do painel" right={<Building2 size={16} className="text-ink-mute" />} />
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div className="flex items-center gap-4">
-            <div className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl border border-hair bg-white/[0.02]">
+            <div className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl border border-hair bg-overlay">
               <Logo size={56} rounded="rounded-xl" />
             </div>
             <div className="flex flex-col items-start gap-1.5">

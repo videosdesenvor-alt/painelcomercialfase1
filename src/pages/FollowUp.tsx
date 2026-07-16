@@ -34,7 +34,7 @@ function FollowCard({
       onDragStart={onDragStart}
       onClick={onOpen}
       className={cn(
-        'group cursor-pointer rounded-xl border border-hair bg-elevated/80 p-3 transition-all duration-200 hover:border-white/20 hover:shadow-lift',
+        'group cursor-pointer rounded-xl border border-hair bg-elevated/80 p-3 transition-all duration-200 hover:border-hair-strong hover:shadow-lift',
         dragging && 'opacity-40',
       )}
     >
@@ -49,7 +49,7 @@ function FollowCard({
       </div>
 
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-        <span className="rounded-md bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-ink-sub">
+        <span className="rounded-md bg-overlay-2 px-1.5 py-0.5 text-[10px] font-medium text-ink-sub">
           {lead.campanha}
         </span>
         {dl && (
@@ -153,7 +153,7 @@ export function FollowUp() {
                 <div className="flex items-center gap-2 border-b border-hair px-3.5 py-3">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: m.color }} />
                   <span className="text-[13px] font-bold text-ink">{m.short}</span>
-                  <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white/[0.06] px-1.5 text-[11px] font-bold text-ink-sub tnum">
+                  <span className="grid h-5 min-w-5 place-items-center rounded-full bg-overlay-2 px-1.5 text-[11px] font-bold text-ink-sub tnum">
                     {items.length}
                   </span>
                   <span className="ml-auto text-[11px] font-semibold text-ink-mute tnum">{moneyShort(total)}</span>

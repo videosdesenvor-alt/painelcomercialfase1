@@ -24,7 +24,7 @@ function KpiBig({ label, value, accent }: { label: string; value: string; accent
 
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-hair bg-white/[0.02] px-3 py-2">
+    <div className="rounded-lg border border-hair bg-overlay px-3 py-2">
       <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-mute">{label}</div>
       <div className="mt-0.5 font-display text-sm font-bold text-ink tnum">{value}</div>
     </div>
@@ -145,7 +145,7 @@ export function Trafego() {
           {trafego.map((t, i) => {
             const roas = t.investido ? t.faturado / t.investido : 0
             return (
-              <div key={t.id} className="rounded-xl border border-hair bg-white/[0.02] p-4">
+              <div key={t.id} className="rounded-xl border border-hair bg-overlay p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
                     <span className="h-3 w-3 rounded-full" style={{ background: canalColor(i) }} />

@@ -33,7 +33,7 @@ export function Donut({
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="rgba(255,255,255,0.05)"
+          style={{ stroke: 'var(--overlay-2)' }}
           strokeWidth={thickness}
         />
         {segments.map((s, i) => {

@@ -69,8 +69,8 @@ function SidebarInner() {
               className={cn(
                 'relative rounded-xl px-3 transition-colors',
                 active
-                  ? 'bg-gradient-to-r from-ember/20 to-ember/5 font-semibold text-white ring-1 ring-ember/30 before:absolute before:-left-3 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-ember before:shadow-[0_0_12px_2px_rgba(253,78,23,0.7)]'
-                  : 'font-semibold text-ink-sub hover:bg-white/[0.04] hover:text-ink',
+                  ? 'bg-gradient-to-r from-ember/20 to-ember/5 font-semibold text-ink ring-1 ring-ember/30 before:absolute before:-left-3 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-ember before:shadow-[0_0_12px_2px_rgba(253,78,23,0.7)]'
+                  : 'font-semibold text-ink-sub hover:bg-overlay-2 hover:text-ink',
               )}
             />
           )
@@ -89,12 +89,12 @@ function SidebarInner() {
           className={cn(
             'rounded-xl px-2 text-xs font-semibold',
             page === 'perfil'
-              ? 'bg-white/[0.06] text-ink ring-1 ring-ember/25'
-              : 'text-ink-sub hover:bg-white/[0.05] hover:text-ink',
+              ? 'bg-overlay-2 text-ink ring-1 ring-ember/25'
+              : 'text-ink-sub hover:bg-overlay-2 hover:text-ink',
           )}
         />
 
-        <div className="flex items-center gap-2 rounded-xl bg-white/[0.02] px-2 py-2" title="Meta do mês">
+        <div className="flex items-center gap-2 rounded-xl bg-overlay px-2 py-2" title="Meta do mês">
           <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-ember/25 to-transparent ring-1 ring-ember/25">
             <Sparkles size={15} className="text-ember" />
           </div>

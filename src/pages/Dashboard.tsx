@@ -102,7 +102,7 @@ export function Dashboard() {
                   <p className="text-xs text-ink-sub">Desempenho consolidado · vs. mês anterior</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="btn-ghost !border-white/15 !bg-white/5 py-2 text-xs backdrop-blur">
+                  <button className="btn-ghost !border-hair-strong !bg-overlay-2 py-2 text-xs backdrop-blur">
                     <Download size={14} /> Exportar
                   </button>
                   <button onClick={() => openEditor(null)} className="btn-ember py-2 text-xs">
@@ -113,7 +113,7 @@ export function Dashboard() {
 
               <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4">
                 {portfolio.map((m, i) => (
-                  <div key={m.label} className={cn('relative', i > 0 && 'sm:pl-4 sm:before:absolute sm:before:left-0 sm:before:top-1 sm:before:h-[80%] sm:before:w-px sm:before:bg-white/10')}>
+                  <div key={m.label} className={cn('relative', i > 0 && 'sm:pl-4 sm:before:absolute sm:before:left-0 sm:before:top-1 sm:before:h-[80%] sm:before:w-px sm:before:bg-overlay-2')}>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-medium text-ink-sub">{m.label}</span>
                       <Delta up={m.up}>{m.delta}</Delta>
@@ -142,7 +142,7 @@ export function Dashboard() {
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <div className="flex rounded-xl border border-hair bg-white/[0.02] p-0.5">
+                  <div className="flex rounded-xl border border-hair bg-overlay p-0.5">
                     {PERIODS.map((p) => (
                       <button
                         key={p.k}
@@ -189,7 +189,7 @@ export function Dashboard() {
               </button>
             </div>
 
-            <div className="mt-4 rounded-xl border border-hair bg-white/[0.03] px-4 py-3 text-center">
+            <div className="mt-4 rounded-xl border border-hair bg-overlay px-4 py-3 text-center">
               <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-mute">Receita da vendedora</div>
               <div className="font-display text-2xl font-bold text-ink tnum">{money(top.receita)}</div>
             </div>
@@ -209,7 +209,7 @@ export function Dashboard() {
               />
             </div>
 
-            <div className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-hair bg-white/[0.02] py-1.5 text-xs text-ink-sub">
+            <div className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-hair bg-overlay py-1.5 text-xs text-ink-sub">
               <CalendarClock size={13} className="text-ink-mute" /> {range}
             </div>
 
@@ -263,7 +263,7 @@ export function Dashboard() {
           {FUNIL.map((id, i) => {
             const c = fun.find((f) => f.id === id)?.count ?? 0
             return (
-              <div key={id} className="rounded-xl border border-hair bg-white/[0.02] p-3">
+              <div key={id} className="rounded-xl border border-hair bg-overlay p-3">
                 <div className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full" style={{ background: STATUS[id].color }} />
                   <span className="text-[11px] font-semibold text-ink-sub">{STATUS[id].short}</span>
@@ -315,7 +315,7 @@ export function Dashboard() {
                   max={maxEstado}
                   color="#FD4E17"
                   leading={
-                    <span className="grid h-8 w-9 shrink-0 place-items-center rounded-lg border border-hair bg-white/[0.02] font-display text-xs font-bold text-ember">
+                    <span className="grid h-8 w-9 shrink-0 place-items-center rounded-lg border border-hair bg-overlay font-display text-xs font-bold text-ember">
                       {e.uf}
                     </span>
                   }
@@ -340,7 +340,7 @@ export function Dashboard() {
                     <span className="truncate font-semibold text-ink">{v.nome}</span>
                     <span className="ml-2 shrink-0 font-semibold text-ink-sub tnum">{moneyShort(v.receita)}</span>
                   </div>
-                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/[0.05]">
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-overlay-2">
                     <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.max((v.receita / maxVend) * 100, 3)}%`, background: vendedorColor(v.nome) }} />
                   </div>
                 </div>
@@ -353,7 +353,7 @@ export function Dashboard() {
           <CardHead title="Atividade recente" sub="Movimentações no funil" right={<Activity size={16} className="text-ink-mute" />} />
           <div className="space-y-1">
             {atividade.map((a, i) => (
-              <button key={i} onClick={() => openDetail(a.leadId)} className="flex w-full items-center gap-3 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-white/[0.03]">
+              <button key={i} onClick={() => openDetail(a.leadId)} className="flex w-full items-center gap-3 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-overlay">
                 <Avatar name={a.por} size="xs" ring={false} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13px] text-ink">

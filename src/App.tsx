@@ -1,4 +1,5 @@
-import { useUI } from './lib/store'
+import { useEffect } from 'react'
+import { useUI, useData } from './lib/store'
 import { Sidebar, BottomNav } from './components/Sidebar'
 import { Topbar } from './components/Topbar'
 import { Dashboard } from './pages/Dashboard'
@@ -15,6 +16,12 @@ import { Toast } from './components/Toast'
 
 export default function App() {
   const page = useUI((s) => s.page)
+  const tema = useData((s) => s.tema)
+
+  // Aplica o tema no <html> — o Tailwind está em darkMode: 'class'
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', tema === 'dark')
+  }, [tema])
 
   return (
     <div className="min-h-dvh">
