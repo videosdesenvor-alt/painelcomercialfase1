@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 import {
-  Search, X, ChevronDown, SlidersHorizontal, ArrowUpDown, Plus, Inbox, CalendarClock,
+  Search, X, ChevronDown, SlidersHorizontal, ArrowUpDown, Plus, Inbox, CalendarClock, Download,
 } from 'lucide-react'
 import { useData, useUI } from '../lib/store'
 import { filterLeads } from '../lib/analytics'
 import { STATUS, STATUS_ORDER, CAMPANHAS, type Lead } from '../lib/types'
-import { money, moneyShort, cn, UF_NOME, UFS, daysUntil, formatDate } from '../lib/utils'
+import { money, moneyShort, num, cn, UF_NOME, UFS, daysUntil, formatDate } from '../lib/utils'
+import { exportarLeads } from '../lib/export'
 import { Avatar } from '../components/Avatar'
 import { StatusBadge } from '../components/StatusBadge'
 import { PageTitle } from '../components/Kit'
@@ -37,7 +38,7 @@ function FilterSelect({
 export function Leads() {
   const leads = useData((s) => s.leads)
   const vendedores = useData((s) => s.vendedores)
-  const { filtros, setFiltro, clearFiltros, openDetail, openEditor } = useUI()
+  const { filtros, setFiltro, clearFiltros, openDetail, openEditor, notify } = useUI()
   const [sortKey, setSortKey] = useState<SortKey>('atualizadoEm')
   const [dir, setDir] = useState<1 | -1>(-1)
 
@@ -88,9 +89,26 @@ export function Leads() {
     <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <PageTitle title="Clientes & Leads" sub={`${leads.length} cadastros na base comercial`} />
-        <button onClick={() => openEditor(null)} className="btn-ember self-start sm:self-auto">
-          <Plus size={16} strokeWidth={2.5} /> Nova venda
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => {
+              if (!rows.length) return notify('Nada para exportar com esses filtros', 'danger')
+              const n = exportarLeads(rows)
+              notify(
+                activeFilters
+                  ? `${num(n)} leads (filtrados) exportados para planilha`
+                  : `${num(n)} leads exportados para planilha`,
+              )
+            }}
+            className="btn-ghost"
+            title="Baixar em CSV o que está na tela (abre no Excel / Google Sheets)"
+          >
+            <Download size={15} /> Exportar
+          </button>
+          <button onClick={() => openEditor(null)} className="btn-ember">
+            <Plus size={16} strokeWidth={2.5} /> Nova venda
+          </button>
+        </div>
       </div>
 
       {/* Filtros */}

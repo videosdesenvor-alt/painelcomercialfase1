@@ -93,6 +93,7 @@ export function BarStat({
   color,
   suffix,
   leading,
+  display,
 }: {
   label: string
   value: number
@@ -100,6 +101,8 @@ export function BarStat({
   color: string
   suffix?: string
   leading?: React.ReactNode
+  /** sobrepõe o número exibido (ex.: moeda); a barra continua usando `value` */
+  display?: string
 }) {
   const pctW = max > 0 ? Math.max((value / max) * 100, 2) : 0
   return (
@@ -109,7 +112,7 @@ export function BarStat({
         <div className="mb-1 flex items-center justify-between text-sm">
           <span className="truncate font-medium text-ink">{label}</span>
           <span className="ml-2 shrink-0 font-semibold text-ink-sub tnum">
-            {value.toLocaleString('pt-BR')}
+            {display ?? value.toLocaleString('pt-BR')}
             {suffix}
           </span>
         </div>

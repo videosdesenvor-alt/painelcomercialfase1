@@ -150,6 +150,13 @@ export const UF_NOME: Record<string, string> = Object.fromEntries(
   UFS.map((u) => [u.uf, u.nome]),
 )
 
+export const REGIOES = ['Norte', 'Nordeste', 'Centro-Oeste', 'Sudeste', 'Sul'] as const
+export type Regiao = (typeof REGIOES)[number]
+
+export const UF_REGIAO: Record<string, Regiao> = Object.fromEntries(
+  UFS.map((u) => [u.uf, u.regiao]),
+)
+
 export function uid(): string {
   return 'l_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)
 }

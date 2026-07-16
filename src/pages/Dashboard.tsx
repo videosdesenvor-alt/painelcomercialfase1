@@ -9,7 +9,11 @@ import {
   serieReceitaDiaria, serieCriacao, movingAvg, valorEmRisco,
 } from '../lib/analytics'
 import { STATUS, FUNIL } from '../lib/types'
-import { money, moneyShort, num, pct, cn, UF_NOME, timeAgoFull, vendedorColor } from '../lib/utils'
+import {
+  money, moneyShort, num, pct, cn, UF_NOME, UF_REGIAO, REGIOES, timeAgoFull, vendedorColor,
+  type Regiao,
+} from '../lib/utils'
+import { exportarLeads } from '../lib/export'
 import { CardHead, BarStat } from '../components/Kit'
 import { AreaLine } from '../components/charts/AreaLine'
 import { Donut } from '../components/charts/Donut'
@@ -46,11 +50,20 @@ const PERIODS = [
   { k: 'MAX', n: 90 },
 ] as const
 
+/** Métricas que o mapa sabe exibir */
+const METRICAS = [
+  { k: 'clientes', label: 'Clientes' },
+  { k: 'receita', label: 'Receita' },
+] as const
+type Metrica = (typeof METRICAS)[number]['k']
+
 export function Dashboard() {
   const leads = useData((s) => s.leads)
   const empresa = useData((s) => s.perfil.empresa) || BRAND.name
-  const { openEditor, openDetail, setFiltro, setPage } = useUI()
+  const { openEditor, openDetail, setFiltro, setPage, notify } = useUI()
   const [period, setPeriod] = useState<string>('30D')
+  const [metrica, setMetrica] = useState<Metrica>('clientes')
+  const [regiao, setRegiao] = useState<'all' | Regiao>('all')
 
   const k = useMemo(() => computeKpis(leads), [leads])
   const risco = useMemo(() => valorEmRisco(leads), [leads])
@@ -67,8 +80,22 @@ export function Dashboard() {
   const labels = useMemo(() => dayLabels(nDays), [nDays])
   const sparkSeed = useMemo(() => serieCriacao(leads, 14), [leads])
 
-  const maxEstado = Math.max(...estados.map((e) => e.total), 1)
-  const estadoCounts = Object.fromEntries(estados.map((e) => [e.uf, e.total]))
+  // ── Mapa: valores conforme a métrica escolhida ──
+  const mapValues = useMemo(
+    () => Object.fromEntries(estados.map((e) => [e.uf, metrica === 'receita' ? e.receita : e.total])),
+    [estados, metrica],
+  )
+  // Escala global: a região só destaca, não reescala as cores.
+  const maxMapa = Math.max(...Object.values(mapValues), 1)
+  const topEstados = useMemo(() => {
+    const base = regiao === 'all' ? estados : estados.filter((e) => UF_REGIAO[e.uf] === regiao)
+    return [...base].sort((a, b) => (mapValues[b.uf] ?? 0) - (mapValues[a.uf] ?? 0)).slice(0, 7)
+  }, [estados, regiao, mapValues])
+  const maxLista = Math.max(...topEstados.map((e) => mapValues[e.uf] ?? 0), 1)
+  const fmtCurto = (v: number) => (metrica === 'receita' ? moneyShort(v).replace('R$ ', '') : num(v))
+  const fmtLongo = (v: number) =>
+    metrica === 'receita' ? money(v) : `${num(v)} cliente${v === 1 ? '' : 's'}`
+
   const maxVend = Math.max(...vendedores.map((v) => v.receita), 1)
   const totalFunil = FUNIL.reduce((a, id) => a + (fun.find((f) => f.id === id)?.count ?? 0), 0) || 1
 
@@ -102,7 +129,14 @@ export function Dashboard() {
                   <p className="text-xs text-ink-sub">Desempenho consolidado · vs. mês anterior</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="btn-ghost !border-hair-strong !bg-overlay-2 py-2 text-xs backdrop-blur">
+                  <button
+                    onClick={() => {
+                      const n = exportarLeads(leads)
+                      notify(`${num(n)} leads exportados para planilha`)
+                    }}
+                    className="btn-ghost !border-hair-strong !bg-overlay-2 py-2 text-xs backdrop-blur"
+                    title="Baixar a base completa em CSV (abre no Excel / Google Sheets)"
+                  >
                     <Download size={14} /> Exportar
                   </button>
                   <button onClick={() => openEditor(null)} className="btn-ember py-2 text-xs">
@@ -277,18 +311,71 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* ───────── Mapa de clientes por estado ───────── */}
+      {/* ───────── Mapa por estado ───────── */}
       <div className="panel p-5">
         <CardHead
-          title="Clientes por estado"
+          title={metrica === 'receita' ? 'Receita por estado' : 'Clientes por estado'}
           sub="Distribuição geográfica · clique num estado para filtrar"
-          right={<MapPin size={16} className="text-ember" />}
+          right={
+            <div className="flex items-center gap-2">
+              <div className="flex rounded-xl border border-hair bg-overlay p-0.5">
+                {METRICAS.map((m) => (
+                  <button
+                    key={m.k}
+                    onClick={() => setMetrica(m.k)}
+                    className={cn(
+                      'rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors',
+                      metrica === m.k
+                        ? 'bg-ember text-white shadow-[0_4px_12px_-4px_rgba(253,78,23,0.8)]'
+                        : 'text-ink-mute hover:text-ink',
+                    )}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+              <MapPin size={16} className="text-ember" />
+            </div>
+          }
         />
+
+        {/* Destaque por região */}
+        <div className="mb-4 flex flex-wrap items-center gap-1.5">
+          <button
+            onClick={() => setRegiao('all')}
+            className={cn(
+              'rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors',
+              regiao === 'all'
+                ? 'border-ember/40 bg-ember/15 text-ember'
+                : 'border-hair bg-overlay text-ink-mute hover:text-ink',
+            )}
+          >
+            Brasil
+          </button>
+          {REGIOES.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRegiao(regiao === r ? 'all' : r)}
+              className={cn(
+                'rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors',
+                regiao === r
+                  ? 'border-ember/40 bg-ember/15 text-ember'
+                  : 'border-hair bg-overlay text-ink-mute hover:text-ink',
+              )}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <BrazilMap
-              counts={estadoCounts}
-              max={maxEstado}
+              values={mapValues}
+              max={maxMapa}
+              format={fmtCurto}
+              formatLong={fmtLongo}
+              regiao={regiao}
               onSelect={(uf) => {
                 setFiltro({ estado: uf, search: '', vendedor: 'all', status: 'all', campanha: 'all' })
                 setPage('leads')
@@ -304,15 +391,18 @@ export function Dashboard() {
           <div>
             <div className="mb-3 flex items-center gap-2">
               <Flame size={15} className="text-ember" />
-              <span className="text-[11px] font-bold uppercase tracking-wider text-ink-mute">Top estados</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-ink-mute">
+                Top estados{regiao !== 'all' && ` · ${regiao}`}
+              </span>
             </div>
             <div className="space-y-3">
-              {estados.slice(0, 7).map((e) => (
+              {topEstados.map((e) => (
                 <BarStat
                   key={e.uf}
                   label={`${e.uf} · ${UF_NOME[e.uf]}`}
-                  value={e.total}
-                  max={maxEstado}
+                  value={mapValues[e.uf] ?? 0}
+                  display={fmtCurto(mapValues[e.uf] ?? 0)}
+                  max={maxLista}
                   color="#FD4E17"
                   leading={
                     <span className="grid h-8 w-9 shrink-0 place-items-center rounded-lg border border-hair bg-overlay font-display text-xs font-bold text-ember">
@@ -321,6 +411,9 @@ export function Dashboard() {
                   }
                 />
               ))}
+              {topEstados.length === 0 && (
+                <p className="text-xs text-ink-mute">Nenhum cliente no {regiao}.</p>
+              )}
             </div>
           </div>
         </div>

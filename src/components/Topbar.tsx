@@ -1,8 +1,9 @@
-import { Search, Plus, Bell, Command } from 'lucide-react'
+import { Search, Plus, Command } from 'lucide-react'
 import { useUI, useData } from '../lib/store'
 import { Avatar } from './Avatar'
 import { Logo } from './Logo'
 import { ThemeToggle } from './ThemeToggle'
+import { Notificacoes } from './Notificacoes'
 
 const HOJE = new Date().toLocaleDateString('pt-BR', {
   weekday: 'long',
@@ -51,13 +52,7 @@ export function Topbar() {
         {/* Ações */}
         <ThemeToggle />
 
-        <button
-          className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-hair bg-overlay text-ink-sub transition-colors hover:text-ink"
-          aria-label="Notificações"
-        >
-          <Bell size={18} />
-          <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-ember shadow-[0_0_8px_2px_rgba(253,78,23,0.8)]" />
-        </button>
+        <Notificacoes />
 
         <button onClick={() => openEditor(null)} className="btn-ember shrink-0 whitespace-nowrap">
           <Plus size={17} strokeWidth={2.5} />

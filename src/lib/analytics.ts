@@ -202,6 +202,46 @@ export function atividadeRecente(leads: Lead[], limit = 8): Atividade[] {
   return all.sort((a, b) => +new Date(b.data) - +new Date(a.data)).slice(0, limit)
 }
 
+/* ── Alertas (sino da Topbar) ── */
+export type AlertaTipo = 'atrasado' | 'hoje' | 'parado'
+
+export interface Alerta {
+  tipo: AlertaTipo
+  leadId: string
+  cliente: string
+  responsavel: string
+  valor: number
+  /** dias de atraso (atrasado) ou dias parado (parado); 0 em "hoje" */
+  dias: number
+}
+
+/** Nº de dias sem mexer no lead para ele contar como "parado" */
+const DIAS_PARADO = 14
+
+/**
+ * Alertas acionáveis a partir dos leads: follow-up atrasado, follow-up de hoje
+ * e negociações ativas esquecidas (sem follow-up marcado e paradas há tempo).
+ * Ordena por urgência — o mais atrasado primeiro.
+ */
+export function alertas(leads: Lead[]): Alerta[] {
+  const out: Alerta[] = []
+  for (const l of leads) {
+    if (l.status === 'ganho' || l.status === 'perdido') continue
+    const base = { leadId: l.id, cliente: l.cliente, responsavel: l.responsavel, valor: l.valor }
+    const d = daysUntil(l.proximoFollowUp)
+    if (d !== null && d < 0) {
+      out.push({ ...base, tipo: 'atrasado', dias: -d })
+    } else if (d === 0) {
+      out.push({ ...base, tipo: 'hoje', dias: 0 })
+    } else if (d === null) {
+      const parado = -(daysUntil(l.atualizadoEm) ?? 0)
+      if (parado >= DIAS_PARADO) out.push({ ...base, tipo: 'parado', dias: parado })
+    }
+  }
+  const peso: Record<AlertaTipo, number> = { atrasado: 0, hoje: 1, parado: 2 }
+  return out.sort((a, b) => peso[a.tipo] - peso[b.tipo] || b.dias - a.dias || b.valor - a.valor)
+}
+
 /** Série temporal: leads criados por dia nos últimos N dias */
 export function serieCriacao(leads: Lead[], dias = 30): number[] {
   const buckets = new Array(dias).fill(0)

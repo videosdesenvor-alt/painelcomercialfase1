@@ -33,6 +33,8 @@ interface DataState {
   moveStatus: (id: string, status: StatusId, autor?: string) => void
   deleteLead: (id: string) => void
   addVendedor: (nome: string) => boolean
+  renameVendedor: (antigo: string, novo: string) => boolean
+  deleteVendedor: (nome: string, reatribuirPara?: string) => boolean
   addTrafego: (input: Omit<TrafegoEntry, 'id'>) => void
   updateTrafego: (id: string, patch: Partial<TrafegoEntry>) => void
   deleteTrafego: (id: string) => void
@@ -68,6 +70,44 @@ export const useData = create<DataState>()(
         if (!n) return false
         if (get().vendedores.some((v) => v.toLowerCase() === n.toLowerCase())) return false
         set((s) => ({ vendedores: [...s.vendedores, n] }))
+        return true
+      },
+
+      // Os leads referenciam o vendedor pelo NOME (l.responsavel), então
+      // renomear tem de arrastar junto os leads e o histórico.
+      renameVendedor: (antigo, novo) => {
+        const n = novo.trim()
+        const s = get()
+        if (!n || !s.vendedores.includes(antigo)) return false
+        if (n === antigo) return true
+        if (s.vendedores.some((v) => v.toLowerCase() === n.toLowerCase())) return false
+        set((st) => ({
+          vendedores: st.vendedores.map((v) => (v === antigo ? n : v)),
+          leads: st.leads.map((l) =>
+            l.responsavel === antigo || l.historico.some((h) => h.por === antigo)
+              ? {
+                  ...l,
+                  responsavel: l.responsavel === antigo ? n : l.responsavel,
+                  historico: l.historico.map((h) => (h.por === antigo ? { ...h, por: n } : h)),
+                }
+              : l,
+          ),
+        }))
+        return true
+      },
+
+      // Remover deixaria leads órfãos: quem tem leads só sai reatribuindo.
+      deleteVendedor: (nome, reatribuirPara) => {
+        const s = get()
+        if (!s.vendedores.includes(nome)) return false
+        const temLeads = s.leads.some((l) => l.responsavel === nome)
+        if (temLeads && (!reatribuirPara || reatribuirPara === nome)) return false
+        set((st) => ({
+          vendedores: st.vendedores.filter((v) => v !== nome),
+          leads: reatribuirPara
+            ? st.leads.map((l) => (l.responsavel === nome ? { ...l, responsavel: reatribuirPara } : l))
+            : st.leads,
+        }))
         return true
       },
 
