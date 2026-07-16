@@ -3,7 +3,7 @@ import {
   Plus, Pencil, Trash2, Megaphone, Wallet, TrendingUp, Target, X, Info, CalendarDays,
 } from 'lucide-react'
 import { useData, useUI } from '../lib/store'
-import { computeTrafegoResumo, trafegoPorMes } from '../lib/analytics'
+import { computeTrafegoResumo, trafegoPorMes, type PeriodoMes } from '../lib/analytics'
 import type { TrafegoLancamento } from '../lib/types'
 import { money, moneyShort, dec2, num, pct, cn } from '../lib/utils'
 import { PageTitle, CardHead } from '../components/Kit'
@@ -13,6 +13,21 @@ const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'o
 function mesLabel(mes: string): string {
   const [ano, m] = mes.split('-').map(Number)
   return `${MESES[(m ?? 1) - 1]}/${ano}`
+}
+
+const mesKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+
+function periodoLabel(p: PeriodoMes): string {
+  if (!p.de && !p.ate) return 'todo o histórico'
+  if (p.de && p.ate) return p.de === p.ate ? mesLabel(p.de) : `${mesLabel(p.de)} – ${mesLabel(p.ate)}`
+  if (p.de) return `desde ${mesLabel(p.de)}`
+  return `até ${mesLabel(p.ate!)}`
+}
+
+/** De/Até invertidos não deve zerar tudo — normaliza na hora de aplicar. */
+function normaliza(p: PeriodoMes): PeriodoMes {
+  if (p.de && p.ate && p.de > p.ate) return { de: p.ate, ate: p.de }
+  return p
 }
 
 function KpiBig({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: 'ember' | 'positive' | 'danger' }) {
@@ -130,8 +145,22 @@ export function Trafego() {
   const deleteLancamento = useData((s) => s.deleteLancamento)
   const notify = useUI((s) => s.notify)
 
-  const k = useMemo(() => computeTrafegoResumo(leads, lancamentos), [leads, lancamentos])
-  const meses = useMemo(() => trafegoPorMes(leads, lancamentos), [leads, lancamentos])
+  // ── Período: por padrão o mês atual; chips + De/Até personalizados ──
+  const mesAtual = mesKey(new Date())
+  const PRESETS: { rotulo: string; p: PeriodoMes }[] = useMemo(() => {
+    const hoje = new Date()
+    return [
+      { rotulo: 'Este mês', p: { de: mesAtual, ate: mesAtual } },
+      { rotulo: '3 meses', p: { de: mesKey(new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1)), ate: mesAtual } },
+      { rotulo: 'Este ano', p: { de: `${hoje.getFullYear()}-01`, ate: mesAtual } },
+      { rotulo: 'Tudo', p: { de: null, ate: null } },
+    ]
+  }, [mesAtual])
+  const [periodo, setPeriodo] = useState<PeriodoMes>({ de: mesAtual, ate: mesAtual })
+  const aplicado = useMemo(() => normaliza(periodo), [periodo])
+
+  const k = useMemo(() => computeTrafegoResumo(leads, lancamentos, aplicado), [leads, lancamentos, aplicado])
+  const meses = useMemo(() => trafegoPorMes(leads, lancamentos, aplicado), [leads, lancamentos, aplicado])
   const semLeadsTrafego = useMemo(() => !leads.some((l) => l.origemTrafego), [leads])
 
   // undefined = fechado; null = novo; objeto = editando
@@ -146,6 +175,45 @@ export function Trafego() {
         <button onClick={() => setModal(null)} className="btn-ember self-start sm:self-auto">
           <Plus size={16} strokeWidth={2.5} /> Novo lançamento
         </button>
+      </div>
+
+      {/* ── Período ── */}
+      <div className="panel flex flex-wrap items-center gap-2 p-3">
+        <CalendarDays size={15} className="ml-1 shrink-0 text-ember" />
+        {PRESETS.map(({ rotulo, p }) => {
+          const ativo = periodo.de === p.de && periodo.ate === p.ate
+          return (
+            <button
+              key={rotulo}
+              onClick={() => setPeriodo(p)}
+              className={cn(
+                'rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors',
+                ativo
+                  ? 'border-ember/40 bg-ember/15 text-ember'
+                  : 'border-hair bg-overlay text-ink-mute hover:text-ink',
+              )}
+            >
+              {rotulo}
+            </button>
+          )
+        })}
+        <div className="ml-auto flex items-center gap-2">
+          <input
+            type="month"
+            className="input !w-auto px-2.5 py-1.5 text-xs"
+            value={periodo.de ?? ''}
+            onChange={(e) => setPeriodo((p) => ({ ...p, de: e.target.value || null }))}
+            aria-label="Período: de"
+          />
+          <span className="text-xs text-ink-mute">até</span>
+          <input
+            type="month"
+            className="input !w-auto px-2.5 py-1.5 text-xs"
+            value={periodo.ate ?? ''}
+            onChange={(e) => setPeriodo((p) => ({ ...p, ate: e.target.value || null }))}
+            aria-label="Período: até"
+          />
+        </div>
       </div>
 
       {/* Aviso quando nenhuma venda está marcada como tráfego */}
@@ -168,8 +236,7 @@ export function Trafego() {
             <p className="text-xs text-ink-sub">Investimento (mídia + honorários) × retorno em vendas concluídas</p>
           </div>
           <span className="chip">
-            <CalendarDays size={13} className="text-ember" /> {num(lancamentos.length)}{' '}
-            {lancamentos.length === 1 ? 'mês lançado' : 'meses lançados'}
+            <CalendarDays size={13} className="text-ember" /> {periodoLabel(aplicado)}
           </span>
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-6 lg:grid-cols-4">
@@ -186,7 +253,11 @@ export function Trafego() {
 
       {/* ── Indicadores ── */}
       <div className="panel p-5">
-        <CardHead title="Indicadores" sub="Custo e eficiência dos leads vindos de anúncio" right={<Target size={16} className="text-ember" />} />
+        <CardHead
+          title="Indicadores"
+          sub={`Custo e eficiência dos leads vindos de anúncio · ${periodoLabel(aplicado)}`}
+          right={<Target size={16} className="text-ember" />}
+        />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <MiniStat label="ROI" value={pct(k.roi * 100)} tone={k.roi >= 0 ? 'positive' : 'danger'} />
           <MiniStat label="CAC" value={k.vendas ? money(Math.round(k.cac)) : '—'} />
@@ -202,7 +273,11 @@ export function Trafego() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* ── Investimento × retorno por mês ── */}
         <div className="panel p-5">
-          <CardHead title="Investimento × retorno" sub="Comparativo mês a mês" right={<TrendingUp size={16} className="text-ink-mute" />} />
+          <CardHead
+            title="Investimento × retorno"
+            sub={`Comparativo mês a mês · ${periodoLabel(aplicado)}`}
+            right={<TrendingUp size={16} className="text-ink-mute" />}
+          />
           {meses.length ? (
             <div className="space-y-4">
               {meses.map((m) => (
@@ -240,13 +315,16 @@ export function Trafego() {
               </div>
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-ink-mute">Sem dados ainda — adicione um lançamento.</p>
+            <p className="py-8 text-center text-sm text-ink-mute">
+              Sem gasto nem venda no período selecionado — ajuste o período acima ou adicione um lançamento.
+            </p>
           )}
         </div>
 
         {/* ── Lançamentos mensais ── */}
         <div className="panel p-5">
-          <CardHead title="Lançamentos mensais" sub="Investido em mídia + honorários da agência" right={<Wallet size={16} className="text-ink-mute" />} />
+          {/* CRUD mostra sempre TODOS os meses — o período filtra só a leitura */}
+          <CardHead title="Lançamentos mensais" sub="Investido em mídia + honorários · todos os meses" right={<Wallet size={16} className="text-ink-mute" />} />
           {lancamentos.length ? (
             <div className="space-y-2.5">
               {[...lancamentos].reverse().map((l) => (

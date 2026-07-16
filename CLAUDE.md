@@ -103,7 +103,9 @@ src/
   RETORNO vem do funil: leads com `origemTrafego: true` (chave "Cliente de
   tráfego" no `LeadEditor`). ROAS = retorno/mídia; ROI e CAC usam o
   investimento total (mídia + honorários). Cálculos em
-  `computeTrafegoResumo`/`trafegoPorMes` (analytics).
+  `computeTrafegoResumo`/`trafegoPorMes` (analytics), filtráveis por
+  `PeriodoMes` (De/Até em 'YYYY-MM'; padrão da página = mês atual). Leads/em
+  aberto contam pelo mês de criação; vendas/retorno pelo mês de fechamento.
 - `MeshBanner.tsx` existe mas está sem uso (imagem de fundo removida a pedido).
 
 ## Estado atual / próximo passo

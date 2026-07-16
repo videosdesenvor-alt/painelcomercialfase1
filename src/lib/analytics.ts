@@ -329,25 +329,46 @@ export interface TrafegoResumo {
   emAberto: number // valor dos leads de tráfego ainda ativos no funil
 }
 
+/** Janela de meses 'YYYY-MM' (inclusiva). null = sem limite naquele lado. */
+export interface PeriodoMes {
+  de: string | null
+  ate: string | null
+}
+
+function dentroPeriodo(mes: string, p?: PeriodoMes | null): boolean {
+  if (!p) return true
+  // formato YYYY-MM ordena certo como string
+  if (p.de && mes < p.de) return false
+  if (p.ate && mes > p.ate) return false
+  return true
+}
+
 export function computeTrafegoResumo(
   leads: Lead[],
   lancamentos: TrafegoLancamento[],
+  periodo?: PeriodoMes | null,
 ): TrafegoResumo {
-  const investido = lancamentos.reduce((a, l) => a + l.investido, 0)
-  const honorarios = lancamentos.reduce((a, l) => a + l.honorarios, 0)
+  const lancs = lancamentos.filter((l) => dentroPeriodo(l.mes, periodo))
+  const investido = lancs.reduce((a, l) => a + l.investido, 0)
+  const honorarios = lancs.reduce((a, l) => a + l.honorarios, 0)
   const investimentoTotal = investido + honorarios
 
+  // Leads/em aberto contam pelo mês de CRIAÇÃO (geração no período);
+  // vendas/retorno pelo mês de FECHAMENTO (atualizadoEm do "ganho").
   let nLeads = 0,
     vendas = 0,
     retorno = 0,
     emAberto = 0
   for (const l of leads) {
     if (!l.origemTrafego) continue
-    nLeads++
+    const criado = dentroPeriodo(l.criadoEm.slice(0, 7), periodo)
+    if (criado) nLeads++
     if (l.status === 'ganho') {
-      vendas++
-      retorno += l.valor
-    } else if (STATUS[l.status].ativo) {
+      if (dentroPeriodo(l.atualizadoEm.slice(0, 7), periodo)) {
+        vendas++
+        retorno += l.valor
+      }
+    } else if (criado && STATUS[l.status].ativo) {
       emAberto += l.valor
     }
   }
@@ -378,16 +399,23 @@ export interface TrafegoMes {
 }
 
 /** Série mensal investimento × retorno (união dos meses com gasto ou venda). */
-export function trafegoPorMes(leads: Lead[], lancamentos: TrafegoLancamento[]): TrafegoMes[] {
+export function trafegoPorMes(
+  leads: Lead[],
+  lancamentos: TrafegoLancamento[],
+  periodo?: PeriodoMes | null,
+): TrafegoMes[] {
   const map = new Map<string, TrafegoMes>()
   const bucket = (mes: string) => {
     if (!map.has(mes)) map.set(mes, { mes, investimento: 0, retorno: 0 })
     return map.get(mes)!
   }
-  for (const l of lancamentos) bucket(l.mes).investimento += l.investido + l.honorarios
+  for (const l of lancamentos) {
+    if (dentroPeriodo(l.mes, periodo)) bucket(l.mes).investimento += l.investido + l.honorarios
+  }
   for (const l of leads) {
     if (!l.origemTrafego || l.status !== 'ganho') continue
-    bucket(l.atualizadoEm.slice(0, 7)).retorno += l.valor
+    const mes = l.atualizadoEm.slice(0, 7)
+    if (dentroPeriodo(mes, periodo)) bucket(mes).retorno += l.valor
   }
   return [...map.values()].sort((a, b) => a.mes.localeCompare(b.mes))
 }
