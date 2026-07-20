@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   Target, Activity, Flame, Users2, ArrowUpRight, ArrowDownRight, MapPin,
   ArrowRight, Download, Plus, Star, MoreHorizontal, ExternalLink, CalendarClock, ChevronRight,
+  PackageOpen, Sparkles,
 } from 'lucide-react'
 import { useData, useUI } from '../lib/store'
 import {
@@ -60,6 +61,7 @@ type Metrica = (typeof METRICAS)[number]['k']
 export function Dashboard() {
   const leads = useData((s) => s.leads)
   const empresa = useData((s) => s.perfil.empresa) || BRAND.name
+  const popularExemplo = useData((s) => s.popularExemplo)
   const { openEditor, openDetail, setFiltro, setPage, notify } = useUI()
   const [period, setPeriod] = useState<string>('30D')
   const [metrica, setMetrica] = useState<Metrica>('clientes')
@@ -114,6 +116,35 @@ export function Dashboard() {
     const f = (d: Date) => d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
     return `${f(start)} – ${f(end)}`
   })()
+
+  // Base vazia (empresa nova no Supabase): estado inicial em vez do dashboard cheio.
+  if (leads.length === 0) {
+    return (
+      <div className="grid min-h-[70vh] place-items-center">
+        <div className="max-w-md text-center">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-hair bg-overlay text-ember">
+            <PackageOpen size={30} />
+          </div>
+          <h2 className="mt-5 font-display text-2xl font-bold text-ink">Sua base está vazia</h2>
+          <p className="mt-2 text-sm text-ink-sub">
+            Comece cadastrando sua primeira venda — ou popule com dados de exemplo para explorar o
+            painel antes de trazer os números reais.
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-2.5 sm:flex-row">
+            <button onClick={() => openEditor(null)} className="btn-ember justify-center">
+              <Plus size={16} strokeWidth={2.5} /> Nova venda
+            </button>
+            <button onClick={() => popularExemplo()} className="btn-ghost justify-center">
+              <Sparkles size={15} /> Popular com dados de exemplo
+            </button>
+          </div>
+          <p className="mt-4 text-[11px] text-ink-mute">
+            Os dados de exemplo entram na sua conta e podem ser apagados a qualquer momento.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-5">

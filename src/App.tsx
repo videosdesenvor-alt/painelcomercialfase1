@@ -19,12 +19,22 @@ import { Toast } from './components/Toast'
 export default function App() {
   const page = useUI((s) => s.page)
   const tema = useData((s) => s.tema)
+  const carregar = useData((s) => s.carregar)
+  const carregado = useData((s) => s.carregado)
   const { session, carregando } = useSession()
 
   // Aplica o tema no <html> — o Tailwind está em darkMode: 'class'
   useEffect(() => {
     document.documentElement.classList.toggle('dark', tema === 'dark')
   }, [tema])
+
+  // Carrega os dados da empresa ao logar; limpa ao sair (evita vazar entre contas).
+  useEffect(() => {
+    if (!supabaseConfigurado) return
+    if (session) carregar()
+    else useData.setState({ carregado: false, empresaId: null, leads: [], vendedores: [], lancamentos: [] })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id])
 
   // Com Supabase ligado, o painel exige login. Sem .env, segue no localStorage.
   if (supabaseConfigurado) {
@@ -36,6 +46,14 @@ export default function App() {
       )
     }
     if (!session) return <Login />
+    if (!carregado) {
+      return (
+        <div className="grid min-h-dvh place-items-center gap-3 text-center">
+          <Loader2 size={26} className="animate-spin text-ember" />
+          <span className="text-sm text-ink-mute">Carregando seus dados…</span>
+        </div>
+      )
+    }
   }
 
   return (

@@ -2,6 +2,9 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Lead, NovoLead, StatusId, TrafegoLancamento, Perfil, Interacao } from './types'
 import { VENDEDORES } from './types'
+import { buildSeed, buildSeedLancamentos } from './seed'
+import { supabaseConfigurado } from './supabase'
+import * as db from './db'
 
 const PERFIL_PADRAO: Perfil = {
   nome: 'Elison Melo',
@@ -10,21 +13,28 @@ const PERFIL_PADRAO: Perfil = {
   empresa: 'Desenvor',
   logo: null,
 }
-import { buildSeed, buildSeedLancamentos } from './seed'
-import { uid } from './utils'
 
 /* ────────────────────────────────────────────────────────────
-   Camada de dados (persistida no navegador — trocável por API)
+   Camada de dados. Com Supabase configurado: carrega do banco no
+   login e grava cada alteração (write-through). Sem Supabase:
+   seed no localStorage (comportamento antigo, para dev sem backend).
+   A INTERFACE é idêntica nos dois modos — a UI não sabe a diferença.
    ──────────────────────────────────────────────────────────── */
 export type Tema = 'light' | 'dark'
 
 interface DataState {
   leads: Lead[]
   vendedores: string[]
-  /** gasto mensal com tráfego (mídia + honorários) — entrada manual */
   lancamentos: TrafegoLancamento[]
   perfil: Perfil
   tema: Tema
+  /** true quando os dados já vieram do banco (ou não há backend) */
+  carregado: boolean
+  empresaId: string | null
+
+  carregar: () => Promise<void>
+  popularExemplo: () => Promise<void>
+
   setTema: (t: Tema) => void
   toggleTema: () => void
   setPerfil: (patch: Partial<Perfil>) => void
@@ -38,61 +48,170 @@ interface DataState {
   addVendedor: (nome: string) => boolean
   renameVendedor: (antigo: string, novo: string) => boolean
   deleteVendedor: (nome: string, reatribuirPara?: string) => boolean
-  /** false se já existe lançamento para aquele mês */
   addLancamento: (input: Omit<TrafegoLancamento, 'id'>) => boolean
   updateLancamento: (id: string, patch: Partial<TrafegoLancamento>) => boolean
   deleteLancamento: (id: string) => void
   resetData: () => void
 }
 
+/** Dispara uma escrita no Supabase e avisa se falhar (não bloqueia a UI). */
+function fire(p: Promise<unknown>, label: string) {
+  p.then((r) => {
+    const error = r && typeof r === 'object' ? (r as { error?: unknown }).error : null
+    if (error) {
+      console.error('[db]', label, error)
+      useUI.getState().notify(`Não foi possível salvar (${label})`, 'danger')
+    }
+  }).catch((e) => {
+    console.error('[db]', label, e)
+    useUI.getState().notify(`Não foi possível salvar (${label})`, 'danger')
+  })
+}
+
 export const useData = create<DataState>()(
   persist(
     (set, get) => ({
-      leads: buildSeed(),
-      vendedores: [...VENDEDORES],
-      lancamentos: buildSeedLancamentos(),
+      leads: supabaseConfigurado ? [] : buildSeed(),
+      vendedores: supabaseConfigurado ? [] : [...VENDEDORES],
+      lancamentos: supabaseConfigurado ? [] : buildSeedLancamentos(),
       perfil: PERFIL_PADRAO,
       tema: 'dark',
+      carregado: !supabaseConfigurado,
+      empresaId: null,
+
+      carregar: async () => {
+        if (!supabaseConfigurado) return
+        set({ carregado: false })
+        try {
+          const d = await db.carregarDados()
+          set({
+            empresaId: d.empresaId,
+            perfil: d.perfil,
+            vendedores: d.vendedores,
+            leads: d.leads,
+            lancamentos: d.lancamentos,
+            carregado: true,
+          })
+        } catch (e) {
+          console.error('[carregar]', e)
+          useUI.getState().notify('Erro ao carregar seus dados', 'danger')
+          set({ carregado: true })
+        }
+      },
+
+      popularExemplo: async () => {
+        const eid = get().empresaId
+        if (!eid) return
+        if (get().leads.length > 0) {
+          useUI.getState().notify('Sua base já tem dados', 'info')
+          return
+        }
+        // Seed com ids em UUID (a coluna id do banco é uuid)
+        const leads = buildSeed().map((l) => ({
+          ...l,
+          id: crypto.randomUUID(),
+          interacoes: (l.interacoes ?? []).map((it) => ({ ...it, id: crypto.randomUUID() })),
+        }))
+        const vendedores = [...VENDEDORES]
+        const lancamentos = buildSeedLancamentos().map((l) => ({ ...l, id: crypto.randomUUID() }))
+        try {
+          await db.inserirEmLote(eid, vendedores, leads, lancamentos)
+          set({ vendedores, leads, lancamentos })
+          useUI.getState().notify('Dados de exemplo carregados')
+        } catch (e) {
+          console.error('[popularExemplo]', e)
+          useUI.getState().notify('Falha ao carregar dados de exemplo', 'danger')
+        }
+      },
 
       setTema: (tema) => set({ tema }),
       toggleTema: () => set((s) => ({ tema: s.tema === 'dark' ? 'light' : 'dark' })),
 
-      setPerfil: (patch) => set((s) => ({ perfil: { ...s.perfil, ...patch } })),
-      resetPerfil: () => set({ perfil: PERFIL_PADRAO }),
+      setPerfil: (patch) => {
+        set((s) => ({ perfil: { ...s.perfil, ...patch } }))
+        const eid = get().empresaId
+        if (eid) fire(db.salvarPerfil(eid, patch), 'perfil')
+      },
+      resetPerfil: () => {
+        set({ perfil: PERFIL_PADRAO })
+        const eid = get().empresaId
+        if (eid) fire(db.salvarPerfil(eid, PERFIL_PADRAO), 'perfil')
+      },
 
-      // Um lançamento por mês de referência — duplicar seria contar o gasto 2x.
-      addLancamento: (input) => {
-        if (get().lancamentos.some((l) => l.mes === input.mes)) return false
+      addLead: (input) => {
+        const lead = db.novoLead(input)
+        set((s) => ({ leads: [lead, ...s.leads] }))
+        const eid = get().empresaId
+        if (eid) fire(db.inserirLead(eid, lead), 'venda')
+        return lead.id
+      },
+
+      updateLead: (id, patch, autor = 'Você') => {
+        const l0 = get().leads.find((l) => l.id === id)
+        if (!l0) return
+        const now = new Date().toISOString()
+        const statusChanged = patch.status && patch.status !== l0.status
+        const historico = statusChanged
+          ? [...l0.historico, { data: now, de: l0.status, para: patch.status!, por: autor }]
+          : l0.historico
+        const patchFull: Partial<Lead> = { ...patch, atualizadoEm: now, historico }
+        set((s) => ({ leads: s.leads.map((l) => (l.id === id ? { ...l, ...patchFull } : l)) }))
+        const eid = get().empresaId
+        if (eid) fire(db.atualizarLead(id, patchFull), 'venda')
+      },
+
+      moveStatus: (id, status, autor = 'Você') => {
+        const l0 = get().leads.find((l) => l.id === id)
+        if (!l0 || l0.status === status) return
+        const now = new Date().toISOString()
+        const historico = [...l0.historico, { data: now, de: l0.status, para: status, por: autor }]
+        const patchFull: Partial<Lead> = { status, atualizadoEm: now, historico }
+        set((s) => ({ leads: s.leads.map((l) => (l.id === id ? { ...l, ...patchFull } : l)) }))
+        const eid = get().empresaId
+        if (eid) fire(db.atualizarLead(id, patchFull), 'estágio')
+      },
+
+      deleteLead: (id) => {
+        set((s) => ({ leads: s.leads.filter((l) => l.id !== id) }))
+        const eid = get().empresaId
+        if (eid) fire(db.removerLead(id), 'exclusão')
+      },
+
+      addInteracao: (leadId, input) => {
+        const now = new Date().toISOString()
+        const nova: Interacao = { ...input, id: crypto.randomUUID(), data: now }
         set((s) => ({
-          lancamentos: [...s.lancamentos, { ...input, id: uid() }].sort((a, b) =>
-            a.mes.localeCompare(b.mes),
+          leads: s.leads.map((l) =>
+            l.id === leadId ? { ...l, interacoes: [...(l.interacoes ?? []), nova], atualizadoEm: now } : l,
           ),
         }))
-        return true
+        const eid = get().empresaId
+        if (eid) {
+          fire(db.inserirInteracao(eid, leadId, nova), 'contato')
+          fire(db.atualizarLead(leadId, { atualizadoEm: now }), 'contato')
+        }
       },
-      updateLancamento: (id, patch) => {
-        const s = get()
-        if (patch.mes && s.lancamentos.some((l) => l.id !== id && l.mes === patch.mes)) return false
-        set((st) => ({
-          lancamentos: st.lancamentos
-            .map((l) => (l.id === id ? { ...l, ...patch } : l))
-            .sort((a, b) => a.mes.localeCompare(b.mes)),
+
+      deleteInteracao: (leadId, interacaoId) => {
+        set((s) => ({
+          leads: s.leads.map((l) =>
+            l.id === leadId ? { ...l, interacoes: (l.interacoes ?? []).filter((i) => i.id !== interacaoId) } : l,
+          ),
         }))
-        return true
+        const eid = get().empresaId
+        if (eid) fire(db.removerInteracao(interacaoId), 'contato')
       },
-      deleteLancamento: (id) =>
-        set((s) => ({ lancamentos: s.lancamentos.filter((l) => l.id !== id) })),
 
       addVendedor: (nome) => {
         const n = nome.trim()
         if (!n) return false
         if (get().vendedores.some((v) => v.toLowerCase() === n.toLowerCase())) return false
         set((s) => ({ vendedores: [...s.vendedores, n] }))
+        const eid = get().empresaId
+        if (eid) fire(db.inserirVendedor(eid, n), 'vendedor')
         return true
       },
 
-      // Os leads referenciam o vendedor pelo NOME (l.responsavel), então
-      // renomear tem de arrastar junto os leads e o histórico.
       renameVendedor: (antigo, novo) => {
         const n = novo.trim()
         const s = get()
@@ -111,10 +230,11 @@ export const useData = create<DataState>()(
               : l,
           ),
         }))
+        const eid = get().empresaId
+        if (eid) fire(db.renomearVendedorDb(eid, antigo, n), 'vendedor')
         return true
       },
 
-      // Remover deixaria leads órfãos: quem tem leads só sai reatribuindo.
       deleteVendedor: (nome, reatribuirPara) => {
         const s = get()
         if (!s.vendedores.includes(nome)) return false
@@ -126,82 +246,42 @@ export const useData = create<DataState>()(
             ? st.leads.map((l) => (l.responsavel === nome ? { ...l, responsavel: reatribuirPara } : l))
             : st.leads,
         }))
+        const eid = get().empresaId
+        if (eid) fire(db.removerVendedorDb(eid, nome, reatribuirPara), 'vendedor')
         return true
       },
 
-      addLead: (input) => {
-        const id = uid()
-        const now = new Date().toISOString()
-        const lead: Lead = {
-          ...input,
-          id,
-          criadoEm: now,
-          atualizadoEm: now,
-          historico: [
-            { data: now, de: null, para: input.status, por: input.responsavel, nota: 'Lead criado' },
-          ],
-        }
-        set((s) => ({ leads: [lead, ...s.leads] }))
-        return id
+      addLancamento: (input) => {
+        if (get().lancamentos.some((l) => l.mes === input.mes)) return false
+        const lanc: TrafegoLancamento = { ...input, id: crypto.randomUUID() }
+        set((s) => ({ lancamentos: [...s.lancamentos, lanc].sort((a, b) => a.mes.localeCompare(b.mes)) }))
+        const eid = get().empresaId
+        if (eid) fire(db.inserirLancamento(eid, lanc), 'lançamento')
+        return true
       },
-
-      updateLead: (id, patch, autor = 'Você') =>
-        set((s) => ({
-          leads: s.leads.map((l) => {
-            if (l.id !== id) return l
-            const now = new Date().toISOString()
-            const statusChanged = patch.status && patch.status !== l.status
-            return {
-              ...l,
-              ...patch,
-              atualizadoEm: now,
-              historico: statusChanged
-                ? [...l.historico, { data: now, de: l.status, para: patch.status!, por: autor }]
-                : l.historico,
-            }
-          }),
-        })),
-
-      moveStatus: (id, status, autor = 'Você') =>
-        set((s) => ({
-          leads: s.leads.map((l) => {
-            if (l.id !== id || l.status === status) return l
-            const now = new Date().toISOString()
-            return {
-              ...l,
-              status,
-              atualizadoEm: now,
-              historico: [...l.historico, { data: now, de: l.status, para: status, por: autor }],
-            }
-          }),
-        })),
-
-      deleteLead: (id) => set((s) => ({ leads: s.leads.filter((l) => l.id !== id) })),
-
-      // Registrar um contato move o lead pro topo do "atendido recentemente"
-      // via atualizadoEm — mesma semântica que uma mensagem nova teria.
-      addInteracao: (leadId, input) =>
-        set((s) => ({
-          leads: s.leads.map((l) => {
-            if (l.id !== leadId) return l
-            const now = new Date().toISOString()
-            const nova: Interacao = { ...input, id: uid(), data: now }
-            return { ...l, interacoes: [...(l.interacoes ?? []), nova], atualizadoEm: now }
-          }),
-        })),
-
-      deleteInteracao: (leadId, interacaoId) =>
-        set((s) => ({
-          leads: s.leads.map((l) =>
-            l.id === leadId
-              ? { ...l, interacoes: (l.interacoes ?? []).filter((i) => i.id !== interacaoId) }
-              : l,
-          ),
-        })),
+      updateLancamento: (id, patch) => {
+        const s = get()
+        if (patch.mes && s.lancamentos.some((l) => l.id !== id && l.mes === patch.mes)) return false
+        set((st) => ({
+          lancamentos: st.lancamentos.map((l) => (l.id === id ? { ...l, ...patch } : l)).sort((a, b) => a.mes.localeCompare(b.mes)),
+        }))
+        const eid = get().empresaId
+        if (eid) fire(db.atualizarLancamento(id, patch), 'lançamento')
+        return true
+      },
+      deleteLancamento: (id) => {
+        set((s) => ({ lancamentos: s.lancamentos.filter((l) => l.id !== id) }))
+        const eid = get().empresaId
+        if (eid) fire(db.removerLancamento(id), 'lançamento')
+      },
 
       resetData: () => set({ leads: buildSeed(), lancamentos: buildSeedLancamentos() }),
     }),
-    { name: 'clea-painel-v2' },
+    {
+      name: 'clea-painel-v2',
+      // Com backend, só o tema fica no navegador; os dados vêm do Supabase.
+      partialize: supabaseConfigurado ? (s) => ({ tema: s.tema }) as Partial<DataState> : undefined,
+    },
   ),
 )
 
