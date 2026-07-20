@@ -12,8 +12,19 @@ npm run dev      # dev server em http://localhost:5178
 npm run build    # tsc -b && vite build  (rodar antes de commitar)
 ```
 
-**Deploy:** `git push origin main` → a Vercel publica sozinha (CI/CD já ligado,
-projeto `agencia-desenvor/painelcomercial`). Não precisa rodar a CLI da Vercel.
+**⚠️ DOIS REMOTES (a partir da Fase 1 / SaaS — jul/2026):**
+- **`origin`** → `videosdesenvor-alt/painelcomercialfase1` — o repo da versão
+  **SaaS multi-tenant** (Supabase). É onde o trabalho novo mora. **NÃO está
+  ligado à Vercel** ainda, então `git push origin main` NÃO deploya nada.
+- **`producao`** → `agenciadesenvor/painelcomercial` — a versão single-tenant
+  **no ar**, congelada. Só recebe push por pedido EXPLÍCITO de hotfix.
+
+Ou seja: o "commitar+push a cada alteração" agora vai para o `origin` (Fase 1),
+e a **produção fica intocada**. Para publicar um hotfix em produção é preciso
+`git push producao main` de propósito.
+
+**Deploy da PRODUÇÃO:** `git push producao main` → a Vercel publica sozinha
+(CI/CD ligado, projeto `agencia-desenvor/painelcomercial`).
 
 **URL pública (a que se compartilha): https://painelcomercial-seven.vercel.app**
 — é o domínio de produção. As URLs geradas (`painelcomercial-agencia-desenvor.
