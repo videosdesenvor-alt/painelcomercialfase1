@@ -12,19 +12,20 @@ npm run dev      # dev server em http://localhost:5178
 npm run build    # tsc -b && vite build  (rodar antes de commitar)
 ```
 
-**⚠️ DOIS REMOTES (a partir da Fase 1 / SaaS — jul/2026):**
-- **`origin`** → `videosdesenvor-alt/painelcomercialfase1` — o repo da versão
-  **SaaS multi-tenant** (Supabase). É onde o trabalho novo mora. **NÃO está
-  ligado à Vercel** ainda, então `git push origin main` NÃO deploya nada.
-- **`producao`** → `agenciadesenvor/painelcomercial` — a versão single-tenant
-  **no ar**, congelada. Só recebe push por pedido EXPLÍCITO de hotfix.
+**DOIS REMOTES — consolidados em jul/2026 (mesma história):**
+- **`producao`** → `agenciadesenvor/painelcomercial` — **é o que está no ar**.
+  Ligado à Vercel: `git push producao main` publica automaticamente.
+- **`origin`** → `videosdesenvor-alt/painelcomercialfase1` — repo onde o SaaS
+  foi construído. **Não deploya nada.** Mantido em sincronia.
 
-Ou seja: o "commitar+push a cada alteração" agora vai para o `origin` (Fase 1),
-e a **produção fica intocada**. Para publicar um hotfix em produção é preciso
-`git push producao main` de propósito.
+A separação (produção congelada × Fase 1) acabou: o SaaS multi-tenant **foi
+promovido para produção**. Agora **empurre para os dois** ao commitar, ou pelo
+menos para `producao` quando quiser publicar.
 
-**Deploy da PRODUÇÃO:** `git push producao main` → a Vercel publica sozinha
-(CI/CD ligado, projeto `agencia-desenvor/painelcomercial`).
+**Config do Supabase fica NO CÓDIGO** (`src/lib/supabase.ts`): URL + anon key
+como padrão, porque a Vercel de produção está num time sem acesso pela CLI. É
+seguro — a anon key é pública por natureza e quem protege os dados é o RLS.
+As variáveis `VITE_SUPABASE_*` (.env) continuam com precedência.
 
 **URL pública (a que se compartilha): https://painelcomercial-seven.vercel.app**
 — é o domínio de produção. As URLs geradas (`painelcomercial-agencia-desenvor.
