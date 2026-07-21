@@ -1,6 +1,8 @@
-import { LayoutDashboard, CalendarCheck, Contact, Users, Megaphone, Sparkles } from 'lucide-react'
+import { LayoutDashboard, CalendarCheck, Contact, Users, Megaphone, Sparkles, LogOut } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useUI, useData, type Page } from '@/lib/store'
+import { supabaseConfigurado } from '@/lib/supabase'
+import { sair } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 import { BRAND } from '@/lib/brand'
 import { Logo } from './Logo'
@@ -104,6 +106,18 @@ function SidebarInner() {
             <div className="text-[11px] text-ink-mute">Bata R$ 250 mil</div>
           </Reveal>
         </div>
+
+        {supabaseConfigurado && (
+          <SidebarLink
+            title="Sair da conta"
+            link={{
+              label: 'Sair',
+              onClick: () => sair(),
+              icon: <LogOut size={18} className="shrink-0" />,
+            }}
+            className="rounded-xl px-2.5 text-xs font-semibold text-ink-mute hover:bg-danger/10 hover:text-danger"
+          />
+        )}
       </div>
     </>
   )

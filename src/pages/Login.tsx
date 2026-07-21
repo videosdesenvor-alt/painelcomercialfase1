@@ -115,6 +115,7 @@ export function Login() {
               ativar a conta e depois volte aqui para entrar.
             </p>
             <button
+              type="button"
               onClick={() => { setConfirmar(false); setModo('entrar') }}
               className="btn-ghost mt-5 w-full justify-center"
             >
@@ -175,6 +176,7 @@ export function Login() {
           <p className="mt-5 animate-fade-up text-center text-sm text-ink-mute" style={{ animationDelay: '220ms' }}>
             {cadastro ? 'Já tem conta?' : 'Ainda não tem conta?'}{' '}
             <button
+              type="button"
               onClick={() => { setModo(cadastro ? 'entrar' : 'cadastrar'); setErro(null) }}
               className="font-semibold text-ember hover:underline"
             >
