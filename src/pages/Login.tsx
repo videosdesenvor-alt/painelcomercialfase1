@@ -9,7 +9,13 @@ type Modo = 'entrar' | 'cadastrar'
 /** Traduz as mensagens de erro mais comuns do Supabase. */
 function traduzErro(msg: string): string {
   const m = msg.toLowerCase()
-  if (m.includes('invalid login')) return 'E-mail ou senha incorretos.'
+  // Falha de rede (offline, bloqueador de anúncios, VPN, conexão instável):
+  // o supabase-js devolve "Failed to fetch" cru, que não diz nada ao usuário.
+  if (m.includes('failed to fetch') || m.includes('networkerror') || m.includes('load failed'))
+    return 'Não conseguimos falar com o servidor. Verifique sua internet (ou algum bloqueador/VPN) e tente de novo.'
+  if (m.includes('timeout') || m.includes('timed out'))
+    return 'A conexão demorou demais. Tente novamente.'
+  if (m.includes('invalid login')) return 'E-mail ou senha incorretos — ou essa conta ainda não existe. Use "Criar conta".'
   if (m.includes('already registered') || m.includes('already been registered')) return 'Esse e-mail já tem conta. Faça login.'
   if (m.includes('password should be at least')) return 'A senha precisa ter pelo menos 6 caracteres.'
   if (m.includes('email not confirmed')) return 'Confirme seu e-mail antes de entrar (veja sua caixa de entrada).'
