@@ -74,8 +74,13 @@ export interface DadosEmpresa {
 
 /* ── Carrega tudo da empresa logada ── */
 export async function carregarDados(): Promise<DadosEmpresa> {
+  // O RLS deixa ver TODOS os perfis da empresa (útil p/ equipe), então
+  // precisamos filtrar pelo id do usuário logado — senão, com 2+ logins,
+  // o maybeSingle recebe várias linhas e falha.
+  const { data: auth } = await supabase.auth.getUser()
+  const uid = auth.user?.id ?? ''
   const [perfilRes, empresaRes, vendRes, leadsRes, interRes, lancRes] = await Promise.all([
-    supabase.from('perfis').select('nome,cargo,foto,empresa_id,papel').maybeSingle(),
+    supabase.from('perfis').select('nome,cargo,foto,empresa_id,papel').eq('id', uid).maybeSingle(),
     supabase.from('empresas').select('id,nome,logo').maybeSingle(),
     supabase.from('vendedores').select('nome').order('nome'),
     supabase.from('leads').select('*').order('criado_em', { ascending: false }),
