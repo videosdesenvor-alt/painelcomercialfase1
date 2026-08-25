@@ -21,3 +21,6 @@ dist-ssr
 # os / editor
 .DS_Store
 *.log
+
+# Estratégia interna — não versionar em repo público
+checklist para escalar.md
