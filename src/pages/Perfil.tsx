@@ -21,6 +21,7 @@ export function Perfil() {
   const perfil = useData((s) => s.perfil)
   const setPerfil = useData((s) => s.setPerfil)
   const resetPerfil = useData((s) => s.resetPerfil)
+  const ehGestor = useData((s) => s.papel) === 'gestor'
   const notify = useUI((s) => s.notify)
   const fotoRef = useRef<HTMLInputElement>(null)
   const logoRef = useRef<HTMLInputElement>(null)
@@ -85,7 +86,8 @@ export function Perfil() {
         </div>
       </div>
 
-      {/* Empresa */}
+      {/* Empresa — só o gestor edita a marca da empresa */}
+      {ehGestor && (
       <div className="panel p-5 sm:p-6">
         <CardHead title="Empresa" sub="Nome e logo exibidos na marca do painel" right={<Building2 size={16} className="text-ink-mute" />} />
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
@@ -114,6 +116,7 @@ export function Perfil() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Rodapé */}
       <div className="flex flex-wrap items-center gap-3">

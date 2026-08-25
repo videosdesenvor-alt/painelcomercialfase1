@@ -16,12 +16,21 @@ import { LeadEditor } from './components/LeadEditor'
 import { LeadDetail } from './components/LeadDetail'
 import { Toast } from './components/Toast'
 
+const SO_GESTOR: Record<string, true> = { trafego: true, equipe: true }
+
 export default function App() {
   const page = useUI((s) => s.page)
+  const setPage = useUI((s) => s.setPage)
   const tema = useData((s) => s.tema)
+  const papel = useData((s) => s.papel)
   const carregar = useData((s) => s.carregar)
   const carregado = useData((s) => s.carregado)
   const { session, carregando } = useSession()
+
+  // Vendedor não acessa páginas de gestão — se cair numa, volta pro início.
+  useEffect(() => {
+    if (papel === 'vendedor' && SO_GESTOR[page]) setPage('dashboard')
+  }, [papel, page, setPage])
 
   // Aplica o tema no <html> — o Tailwind está em darkMode: 'class'
   useEffect(() => {
@@ -32,7 +41,7 @@ export default function App() {
   useEffect(() => {
     if (!supabaseConfigurado) return
     if (session) carregar()
-    else useData.setState({ carregado: false, empresaId: null, leads: [], vendedores: [], lancamentos: [] })
+    else useData.setState({ carregado: false, empresaId: null, papel: 'gestor', leads: [], vendedores: [], lancamentos: [] })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id])
 

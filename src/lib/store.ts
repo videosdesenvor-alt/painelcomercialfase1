@@ -28,6 +28,8 @@ interface DataState {
   lancamentos: TrafegoLancamento[]
   perfil: Perfil
   tema: Tema
+  /** papel do usuário logado: gestor vê tudo, vendedor só o que é dele */
+  papel: db.Papel
   /** true quando os dados já vieram do banco (ou não há backend) */
   carregado: boolean
   empresaId: string | null
@@ -76,6 +78,7 @@ export const useData = create<DataState>()(
       lancamentos: supabaseConfigurado ? [] : buildSeedLancamentos(),
       perfil: PERFIL_PADRAO,
       tema: 'dark',
+      papel: 'gestor',
       carregado: !supabaseConfigurado,
       empresaId: null,
 
@@ -86,6 +89,7 @@ export const useData = create<DataState>()(
           const d = await db.carregarDados()
           set({
             empresaId: d.empresaId,
+            papel: d.papel,
             perfil: d.perfil,
             vendedores: d.vendedores,
             leads: d.leads,

@@ -61,8 +61,11 @@ function leadToRow(l: Partial<Lead>): Record<string, unknown> {
   return row
 }
 
+export type Papel = 'gestor' | 'vendedor'
+
 export interface DadosEmpresa {
   empresaId: string
+  papel: Papel
   perfil: Perfil
   vendedores: string[]
   leads: Lead[]
@@ -72,7 +75,7 @@ export interface DadosEmpresa {
 /* ── Carrega tudo da empresa logada ── */
 export async function carregarDados(): Promise<DadosEmpresa> {
   const [perfilRes, empresaRes, vendRes, leadsRes, interRes, lancRes] = await Promise.all([
-    supabase.from('perfis').select('nome,cargo,foto,empresa_id').maybeSingle(),
+    supabase.from('perfis').select('nome,cargo,foto,empresa_id,papel').maybeSingle(),
     supabase.from('empresas').select('id,nome,logo').maybeSingle(),
     supabase.from('vendedores').select('nome').order('nome'),
     supabase.from('leads').select('*').order('criado_em', { ascending: false }),
@@ -93,6 +96,7 @@ export async function carregarDados(): Promise<DadosEmpresa> {
 
   return {
     empresaId: empresaRes.data?.id ?? perfilRes.data?.empresa_id ?? '',
+    papel: (perfilRes.data?.papel as Papel) ?? 'gestor',
     perfil: {
       nome: perfilRes.data?.nome ?? '',
       cargo: perfilRes.data?.cargo ?? '',

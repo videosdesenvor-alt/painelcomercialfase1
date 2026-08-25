@@ -62,6 +62,9 @@ function Select({ value, onChange, children }: { value: string; onChange: (v: st
 export function LeadEditor() {
   const { editorOpen, editingId, closeEditor, notify } = useUI()
   const { leads, addLead, updateLead, vendedores } = useData()
+  const papel = useData((s) => s.papel)
+  const meuNome = useData((s) => s.perfil.nome)
+  const ehVendedor = papel === 'vendedor'
   const [f, setF] = useState<Form>(EMPTY)
   const editing = editingId ? leads.find((l) => l.id === editingId) : null
 
@@ -84,7 +87,12 @@ export function LeadEditor() {
         origemTrafego: !!editing.origemTrafego,
       })
     } else {
-      setF({ ...EMPTY, numero: String(1000 + leads.length + 1), responsavel: vendedores[0] ?? '' })
+      // Vendedor só cria lead pra si mesmo (o RLS também exige isso).
+      setF({
+        ...EMPTY,
+        numero: String(1000 + leads.length + 1),
+        responsavel: ehVendedor ? meuNome : vendedores[0] ?? '',
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorOpen, editingId])
@@ -212,11 +220,15 @@ export function LeadEditor() {
           </Field>
 
           <Field label="Vendedor">
-            <Select value={f.responsavel} onChange={(v) => set({ responsavel: v })}>
-              {vendedores.map((v) => (
-                <option key={v} value={v}>{v}</option>
-              ))}
-            </Select>
+            {ehVendedor ? (
+              <input className="input opacity-70" value={f.responsavel} readOnly title="Vendas suas ficam no seu nome" />
+            ) : (
+              <Select value={f.responsavel} onChange={(v) => set({ responsavel: v })}>
+                {vendedores.map((v) => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </Select>
+            )}
           </Field>
           <Field label="Próximo follow-up">
             <input type="date" className="input" value={f.proximoFollowUp} onChange={(e) => set({ proximoFollowUp: e.target.value })} />

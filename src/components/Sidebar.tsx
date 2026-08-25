@@ -13,13 +13,19 @@ import { Sidebar as SidebarRoot, DesktopSidebar, SidebarLink, useSidebar } from 
 export const RAIL = 68
 export const EXPANDED = 268
 
-const NAV: { id: Page; label: string; icon: typeof LayoutDashboard }[] = [
+/** `soGestor`: abas que o vendedor não vê (gestão da empresa). */
+const NAV: { id: Page; label: string; icon: typeof LayoutDashboard; soGestor?: boolean }[] = [
   { id: 'dashboard', label: 'Visão Geral', icon: LayoutDashboard },
   { id: 'followup', label: 'Follow-up', icon: CalendarCheck },
   { id: 'leads', label: 'Clientes', icon: Contact },
-  { id: 'trafego', label: 'Tráfego', icon: Megaphone },
-  { id: 'equipe', label: 'Equipe', icon: Users },
+  { id: 'trafego', label: 'Tráfego', icon: Megaphone, soGestor: true },
+  { id: 'equipe', label: 'Equipe', icon: Users, soGestor: true },
 ]
+
+/** Filtra a navegação conforme o papel. */
+function navDoPapel(papel: 'gestor' | 'vendedor') {
+  return papel === 'gestor' ? NAV : NAV.filter((n) => !n.soGestor)
+}
 
 /** Texto que some quando o rail está recolhido */
 function Reveal({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -39,7 +45,9 @@ function Reveal({ children, className }: { children: React.ReactNode; className?
 function SidebarInner() {
   const { page, setPage } = useUI()
   const perfil = useData((s) => s.perfil)
+  const papel = useData((s) => s.papel)
   const empresa = useData((s) => s.perfil.empresa) || BRAND.name
+  const nav = navDoPapel(papel)
 
   return (
     <>
@@ -57,7 +65,7 @@ function SidebarInner() {
         <Reveal className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-mute">
           Operação
         </Reveal>
-        {NAV.map((n) => {
+        {nav.map((n) => {
           const active = page === n.id
           const Icon = n.icon
           return (
@@ -139,12 +147,13 @@ export function Sidebar() {
 
 export function BottomNav() {
   const { page, setPage } = useUI()
+  const papel = useData((s) => s.papel)
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t border-hair bg-surface/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       aria-label="Navegação principal"
     >
-      {NAV.map((n) => {
+      {navDoPapel(papel).map((n) => {
         const active = page === n.id
         const Icon = n.icon
         return (
